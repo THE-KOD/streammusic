@@ -1,0 +1,344 @@
+@startuml DiagrammeClasses_StreamMusic_OrienteDonnees
+
+title Diagramme de classes UML — orienté données (StreamMusic)
+
+skinparam classAttributeIconSize 0
+hide circle
+hide empty members
+
+' ===================== ENUMS =====================
+enum TypeAbonnement {
+  GRATUIT
+  PREMIUM
+}
+
+enum Visibilite {
+  PUBLIQUE
+  PRIVEE
+}
+
+enum TypeNotification {
+  NOUVELLE_SORTIE
+  SYSTEME
+}
+
+enum StatutModeration {
+  EN_ATTENTE
+  VALIDE
+  REJETE
+}
+
+enum StatutCompte {
+  ACTIF
+  SUSPENDU
+}
+
+' ===================== UTILISATEUR & SPECIALISATIONS =====================
+class Utilisateur {
+  + id : UUID <<PK>>
+  + pseudo : String <<unique>>
+  + email : String <<unique>>
+  + motDePasseHash : String <<nullable>>
+  + oauthProvider : String <<nullable>>
+  + oauthId : String <<nullable>>
+  + photoProfilUrl : String
+  + statutCompte : StatutCompte
+  + dateInscription : Date
+}
+
+class Artiste {
+  + biographie : Text
+  + photoArtisteUrl : String
+}
+
+class Administrateur {
+  + niveauAcces : String
+}
+
+' ===================== AUTHENTIFICATION =====================
+class Session {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK>>
+  + refreshTokenHash : String
+  + dateCreation : DateTime
+  + dateExpiration : DateTime
+  + revoque : Boolean
+}
+
+' ===================== ABONNEMENT =====================
+class Abonnement {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK, unique>>
+  + type : TypeAbonnement
+  + dateDebut : Date
+  + dateFin : Date <<nullable>>
+}
+
+' ===================== CATALOGUE =====================
+class Genre {
+  + id : UUID <<PK>>
+  + nom : String <<unique>>
+}
+
+class Album {
+  + id : UUID <<PK>>
+  + artiste_id : UUID <<FK>>
+  + titre : String
+  + pochetteUrl : String
+  + dateSortie : Date
+}
+
+class Titre {
+  + id : UUID <<PK>>
+  + album_id : UUID <<FK, nullable>>
+  + artiste_id : UUID <<FK>>
+  + genre_id : UUID <<FK>>
+  + titre : String
+  + duree : Integer
+  + fichierAudioUrl : String
+  + pochetteUrl : String <<nullable>>
+  + dateSortie : Date <<nullable>>
+  + nombreEcoutes : Integer
+  + dateAjout : Date
+  + statutModeration : StatutModeration
+  + moderateur_id : UUID <<FK, nullable>>
+  + dateModeration : DateTime <<nullable>>
+}
+
+' ===================== PLAYLISTS =====================
+class Playlist {
+  + id : UUID <<PK>>
+  + proprietaire_id : UUID <<FK>>
+  + nom : String
+  + visibilite : Visibilite
+  + dateCreation : Date
+}
+
+class PlaylistTitre <<association class>> {
+  + playlist_id : UUID <<FK>>
+  + titre_id : UUID <<FK>>
+  + ordre : Integer
+  + dateAjout : Date
+}
+
+' ===================== FAVORIS / SUIVI =====================
+class Favori <<association class>> {
+  + utilisateur_id : UUID <<FK>>
+  + titre_id : UUID <<FK>>
+  + dateAjout : Date
+}
+
+class AlbumFavori <<association class>> {
+  + utilisateur_id : UUID <<FK>>
+  + album_id : UUID <<FK>>
+  + dateAjout : Date
+}
+
+class Suivi <<association class>> {
+  + follower_id : UUID <<FK>>
+  + artiste_id : UUID <<FK>>
+  + dateSuivi : Date
+}
+
+class UtilisateurGenrePrefere <<association class>> {
+  + utilisateur_id : UUID <<FK>>
+  + genre_id : UUID <<FK>>
+}
+
+' ===================== HISTORIQUE / FILE D'ATTENTE =====================
+class HistoriqueEcoute {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK>>
+  + titre_id : UUID <<FK>>
+  + dateEcoute : DateTime
+  + dureeEcoutee : Integer
+}
+
+class FileAttente {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK, unique>>
+}
+
+class FileAttenteTitre <<association class>> {
+  + file_id : UUID <<FK>>
+  + titre_id : UUID <<FK>>
+  + ordre : Integer
+}
+
+' ===================== NOTIFICATIONS / SUGGESTIONS =====================
+class Notification {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK>>
+  + titre_id : UUID <<FK, nullable>>
+  + type : TypeNotification
+  + message : String
+  + dateEnvoi : DateTime
+  + lu : Boolean
+}
+
+class Suggestion {
+  + id : UUID <<PK>>
+  + utilisateur_id : UUID <<FK>>
+  + titre_id : UUID <<FK>>
+  + score : Float
+  + dateGeneration : DateTime
+}
+
+' ===================== RELATIONS =====================
+
+' Généralisation
+Utilisateur <|-- Artiste
+Utilisateur <|-- Administrateur
+
+' Session (authentification)
+Utilisateur "1" -- "0..*" Session : possède >
+
+' Abonnement (1 - 1)
+Utilisateur "1" -- "1" Abonnement : possède >
+
+' Catalogue
+Artiste "1" -- "0..*" Album : publie >
+Artiste "1" -- "0..*" Titre : publie >
+Album "0..1" -- "0..*" Titre : regroupe >
+Genre "1" -- "0..*" Titre : catégorise >
+
+' Playlists (association class -> classe pivot)
+Utilisateur "1" -- "0..*" Playlist : possède >
+Playlist "1" -- "0..*" PlaylistTitre
+Titre "1" -- "0..*" PlaylistTitre
+
+' Favoris (titres)
+Utilisateur "1" -- "0..*" Favori
+Titre "1" -- "0..*" Favori
+
+' Favoris (albums)
+Utilisateur "1" -- "0..*" AlbumFavori
+Album "1" -- "0..*" AlbumFavori
+
+' Suivi
+Utilisateur "1" -- "0..*" Suivi : (follower) >
+Artiste "1" -- "0..*" Suivi : (suivi par) >
+
+' Préférences musicales
+Utilisateur "1" -- "0..*" UtilisateurGenrePrefere
+Genre "1" -- "0..*" UtilisateurGenrePrefere
+
+' Historique
+Utilisateur "1" -- "0..*" HistoriqueEcoute : génère >
+Titre "1" -- "0..*" HistoriqueEcoute : concerne >
+
+' File d'attente
+Utilisateur "1" -- "0..1" FileAttente : possède >
+FileAttente "1" -- "0..*" FileAttenteTitre
+Titre "1" -- "0..*" FileAttenteTitre
+
+' Notifications
+Utilisateur "1" -- "0..*" Notification : reçoit >
+
+' Suggestions
+Utilisateur "1" -- "0..*" Suggestion : reçoit >
+Titre "1" -- "0..*" Suggestion : est suggéré via >
+
+' Notifications (référence à l'objet déclencheur)
+Titre "0..1" -- "0..*" Notification : déclenche >
+
+' Modération (traçable via moderateur_id sur Titre)
+Administrateur "0..1" -- "0..*" Titre : modère >
+
+note right of Titre
+  **Titre = entité pivot du domaine.**
+  album_id est nullable pour permettre
+  la publication d'un single sans album.
+end note
+
+note right of PlaylistTitre
+  Clé primaire composite :
+  (playlist_id, titre_id)
+  Portée par la relation many-to-many
+  Playlist <-> Titre, avec un ordre explicite.
+end note
+
+note bottom of Abonnement
+  Relation 1-1 stricte avec Utilisateur :
+  chaque utilisateur a exactement
+  un abonnement actif à la fois
+  (historique des changements = hors scope MVP).
+end note
+
+note bottom of Suivi
+  Classe d'association many-to-many
+  Utilisateur (follower) <-> Artiste (suivi).
+  Prévoir extension V2 : suivi entre
+  deux Utilisateurs (pas seulement Artiste).
+end note
+
+note right of Playlist
+  MVP : un seul propriétaire (proprietaire_id).
+  Extension V2 (playlist collaborative) :
+  ajouter une table de jointure
+  PlaylistCollaborateur (playlist_id, utilisateur_id)
+  en many-to-many.
+end note
+
+note left of FileAttente
+  Cardinalité 0..1 : la file d'attente
+  n'est créée qu'au premier lancement
+  de lecture, pas à l'inscription.
+end note
+
+note bottom of Titre
+  moderateur_id et dateModeration sont nullable :
+  un titre nouvellement uploadé est EN_ATTENTE
+  tant qu'aucun administrateur n'est intervenu.
+  ---
+  pochetteUrl et dateSortie sont propres au Titre
+  (distincts de ceux d'Album) pour couvrir le cas
+  d'un single sans album : dateAjout reste la date
+  de mise en ligne sur la plateforme, dateSortie
+  est la date de sortie officielle du morceau.
+end note
+
+note bottom of Suggestion
+  Volontairement non relié à HistoriqueEcoute :
+  Suggestion est un résultat calculé par le
+  service de recommandation (batch/asynchrone),
+  pas une donnée saisie ni une FK structurelle.
+end note
+
+note left of Utilisateur
+  **Contrainte métier (à valider en base) :**
+  motDePasseHash renseigné OU oauthId renseigné.
+  Les deux sont nullable pour permettre un compte
+  créé uniquement via Google (OAuth), mais un
+  utilisateur doit disposer d'au moins une
+  méthode d'authentification.
+  ---
+  oauthProvider + oauthId : unicité combinée
+  (un même compte Google ne peut être lié
+  qu'à un seul utilisateur).
+end note
+
+note right of Session
+  Distincte de FileAttente : Session gère
+  l'authentification (refresh token), pas la
+  lecture. Un utilisateur peut avoir plusieurs
+  sessions actives (plusieurs appareils).
+  revoque = true à la déconnexion, pour
+  invalider le refresh token avant expiration.
+end note
+
+note bottom of AlbumFavori
+  Miroir exact de Favori, mais pour Album.
+  Absent du modèle métier initial :
+  ajouté suite à l'audit des écrans
+  (Bibliothèque : "albums sauvegardés").
+end note
+
+note bottom of UtilisateurGenrePrefere
+  Modélise les "préférences" mentionnées dans
+  le besoin fonctionnel de modification du profil.
+  Many-to-many plutôt qu'un champ unique :
+  un utilisateur peut préférer plusieurs genres.
+end note
+
+@enduml
