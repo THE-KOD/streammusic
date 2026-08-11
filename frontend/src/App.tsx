@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router'
 
+import { ToastContainer } from './core/providers/toast-container'
+
 import { LandingPage } from './core/router/pages/landing-page'
 import { NotFoundPage } from './core/router/pages/not-found-page'
 
@@ -24,6 +26,7 @@ import { PremiumPage } from './features/premium/presentation/pages/premium-page'
 
 function App() {
   return (
+    <>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -46,6 +49,9 @@ function App() {
         <Route path="/premium" element={<PremiumPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+
+      <ToastContainer />
+    </>
   )
 }
 

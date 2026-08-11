@@ -1,1 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
+
+@theme {
+    --color-ink: #14181F;
+    --color-surface: #1D222B;
+    --color-surface-raised: #262C38;
+    --color-amber: #E3A72F;
+    --color-teal: #4FB6A8;
+    --color-ivory: #EDEAE2;
+    --color-muted: #8B92A3;
+    --color-danger: #E0605A;
+
+    --font-display: "Familjen Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+}
+
+body {
+    background-color: var(--color-ink);
+    color: var(--color-ivory);
+    font-family: var(--font-body);
+}
+
+@keyframes eq {
+    0%, 100% { transform: scaleY(0.4); }
+    50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-\[eq_0\.8s_ease-in-out_infinite\] {
+        animation: none;
+        transform: scaleY(0.7);
+    }
+}
