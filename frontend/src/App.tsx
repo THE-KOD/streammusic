@@ -1,10 +1,8 @@
 import { Routes, Route } from 'react-router'
-
 import { ToastContainer } from './core/providers/toast-container'
-
+import { MainLayout } from './core/layout/main-layout'
 import { LandingPage } from './core/router/pages/landing-page'
 import { NotFoundPage } from './core/router/pages/not-found-page'
-
 import { LoginPage } from './features/auth/presentation/pages/login-page'
 import { RegisterPage } from './features/auth/presentation/pages/register-page'
 import { HomePage } from './features/home/presentation/pages/home-page'
@@ -26,32 +24,35 @@ import { PremiumPage } from './features/premium/presentation/pages/premium-page'
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/artists/:artistId" element={<ArtistProfilePage />} />
-        <Route path="/albums/:albumId" element={<AlbumDetailPage />} />
-        <Route path="/playlists" element={<MyPlaylistsPage />} />
-        <Route path="/playlists/:playlistId" element={<PlaylistDetailPage />} />
-        <Route path="/library" element={<LibraryPage />} />
-        <Route path="/queue" element={<QueuePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/history" element={<ListeningHistoryPage />} />
-        <Route path="/upload" element={<UploadPage />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
-        <Route path="/admin/users" element={<AdminUsersPage />} />
-        <Route path="/admin/moderation" element={<AdminModerationPage />} />
-        <Route path="/premium" element={<PremiumPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-      <ToastContainer />
-    </>
+          <Route element={<MainLayout />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/artists/:artistId" element={<ArtistProfilePage />} />
+            <Route path="/albums/:albumId" element={<AlbumDetailPage />} />
+            <Route path="/playlists" element={<MyPlaylistsPage />} />
+            <Route path="/playlists/:playlistId" element={<PlaylistDetailPage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/queue" element={<QueuePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/history" element={<ListeningHistoryPage />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/moderation" element={<AdminModerationPage />} />
+            <Route path="/premium" element={<PremiumPage />} />
+          </Route>
+
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+        <ToastContainer />
+      </>
   )
 }
 

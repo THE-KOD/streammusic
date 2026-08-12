@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router'
-import { Avatar } from './avatar'
+import { Avatar } from '../../shared/components/avatar'
 import clsx from 'clsx'
 
 const navItems = [
