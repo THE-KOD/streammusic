@@ -1,35 +1,27 @@
 // features/player/presentation/store/player-store.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-export interface Track {
-    id: string
-    title: string
-    artist: string
-    album?: string
-    duration: number // secondes
-    coverUrl?: string
-    fileUrl: string
-}
+import type { Track } from '../../../../shared/types/track'
+import { getNextIndex, getPreviousIndex, reorderQueue, type RepeatMode } from '../../domain/queue-logic'
 
 interface PlayerState {
-    currentTrack: Track | null
     queue: Track[]
     currentIndex: number
     isPlaying: boolean
-    progress: number // 0-100
-    volume: number // 0-100
+    progress: number
+    volume: number
+    volumeBeforeMute: number
     shuffle: boolean
-    repeat: 'none' | 'all' | 'one'
-    // Actions
-    setCurrentTrack: (track: Track, queue?: Track[]) => void
-    play: () => void
-    pause: () => void
+    repeat: RepeatMode
+
+    playTrack: (track: Track, queue?: Track[]) => void
+    playFromQueueIndex: (index: number) => void
     togglePlay: () => void
     next: () => void
     previous: () => void
     seek: (value: number) => void
     setVolume: (value: number) => void
+    toggleMute: () => void
     toggleShuffle: () => void
     toggleRepeat: () => void
     addToQueue: (tracks: Track | Track[]) => void
@@ -42,93 +34,91 @@ interface PlayerState {
 export const usePlayerStore = create<PlayerState>()(
     persist(
         (set, get) => ({
-            currentTrack: null,
             queue: [],
             currentIndex: -1,
             isPlaying: false,
             progress: 0,
             volume: 80,
+            volumeBeforeMute: 80,
             shuffle: false,
             repeat: 'none',
 
-            setCurrentTrack: (track, queue = []) => {
+            playTrack: (track, queue = []) => {
                 const newQueue = queue.length > 0 ? queue : [track]
-                const index = newQueue.findIndex(t => t.id === track.id)
-                set({
-                    currentTrack: track,
-                    queue: newQueue,
-                    currentIndex: index >= 0 ? index : 0,
-                    progress: 0,
-                    isPlaying: true,
-                })
+                const index = newQueue.findIndex((t) => t.id === track.id)
+                set({ queue: newQueue, currentIndex: index >= 0 ? index : 0, progress: 0, isPlaying: true })
             },
 
-            play: () => set({ isPlaying: true }),
-            pause: () => set({ isPlaying: false }),
+            playFromQueueIndex: (index) => {
+                const { queue } = get()
+                if (index < 0 || index >= queue.length) return
+                set({ currentIndex: index, progress: 0, isPlaying: true })
+            },
+
             togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
 
             next: () => {
-                const { queue, currentIndex, repeat } = get() // shuffle retiré
-                if (queue.length === 0) return
-                let nextIndex = currentIndex + 1
-                if (nextIndex >= queue.length) {
-                    if (repeat === 'all') nextIndex = 0
-                    else return
-                }
-                const nextTrack = queue[nextIndex]
-                set({ currentTrack: nextTrack, currentIndex: nextIndex, progress: 0, isPlaying: true })
+                const { queue, currentIndex, repeat, shuffle } = get()
+                const nextIndex = getNextIndex(queue.length, currentIndex, repeat, shuffle)
+                if (nextIndex === null) { set({ isPlaying: false }); return }
+                set({ currentIndex: nextIndex, progress: 0, isPlaying: true })
             },
 
             previous: () => {
-                const { queue, currentIndex } = get()
-                if (queue.length === 0 || currentIndex <= 0) return
-                const prevIndex = currentIndex - 1
-                const prevTrack = queue[prevIndex]
-                set({ currentTrack: prevTrack, currentIndex: prevIndex, progress: 0, isPlaying: true })
+                const { queue, currentIndex, shuffle } = get()
+                const prevIndex = getPreviousIndex(queue.length, currentIndex, shuffle)
+                if (prevIndex === null) return
+                set({ currentIndex: prevIndex, progress: 0, isPlaying: true })
             },
 
             seek: (value) => set({ progress: value }),
 
-            setVolume: (value) => set({ volume: Math.min(100, Math.max(0, value)) }),
-
-            toggleShuffle: () => {
-                set((state) => ({ shuffle: !state.shuffle }))
+            setVolume: (value) => {
+                const clamped = Math.min(100, Math.max(0, value))
+                set({ volume: clamped, volumeBeforeMute: clamped > 0 ? clamped : get().volumeBeforeMute })
             },
 
+            toggleMute: () => {
+                const { volume, volumeBeforeMute } = get()
+                set(volume === 0 ? { volume: volumeBeforeMute || 80 } : { volume: 0, volumeBeforeMute: volume })
+            },
+
+            toggleShuffle: () => set((state) => ({ shuffle: !state.shuffle })),
+
             toggleRepeat: () => {
-                const modes = ['none', 'all', 'one'] as const
-                const current = get().repeat
-                const idx = modes.indexOf(current)
-                const next = modes[(idx + 1) % modes.length]
-                set({ repeat: next })
+                const modes: RepeatMode[] = ['none', 'all', 'one']
+                const idx = modes.indexOf(get().repeat)
+                set({ repeat: modes[(idx + 1) % modes.length] })
             },
 
             addToQueue: (tracks) => {
                 const arr = Array.isArray(tracks) ? tracks : [tracks]
-                set((state) => ({
-                    queue: [...state.queue, ...arr],
-                }))
+                set((state) => ({ queue: [...state.queue, ...arr] }))
             },
 
             removeFromQueue: (index) => {
                 set((state) => {
                     const newQueue = [...state.queue]
                     newQueue.splice(index, 1)
-                    return { queue: newQueue }
+                    let newIndex = state.currentIndex
+                    if (index < state.currentIndex) newIndex -= 1
+                    else if (index === state.currentIndex) newIndex = Math.min(newIndex, newQueue.length - 1)
+                    return { queue: newQueue, currentIndex: newQueue.length === 0 ? -1 : newIndex }
                 })
             },
 
             moveInQueue: (from, to) => {
                 set((state) => {
-                    const newQueue = [...state.queue]
-                    const [item] = newQueue.splice(from, 1)
-                    newQueue.splice(to, 0, item)
-                    return { queue: newQueue }
+                    const newQueue = reorderQueue(state.queue, from, to)
+                    let newIndex = state.currentIndex
+                    if (from === state.currentIndex) newIndex = to
+                    else if (from < state.currentIndex && to >= state.currentIndex) newIndex -= 1
+                    else if (from > state.currentIndex && to <= state.currentIndex) newIndex += 1
+                    return { queue: newQueue, currentIndex: newIndex }
                 })
             },
 
-            clearQueue: () => set({ queue: [], currentIndex: -1 }),
-
+            clearQueue: () => set({ queue: [], currentIndex: -1, isPlaying: false }),
             setProgress: (value) => set({ progress: value }),
         }),
         {
@@ -140,6 +130,11 @@ export const usePlayerStore = create<PlayerState>()(
                 shuffle: state.shuffle,
                 repeat: state.repeat,
             }),
-        }
-    )
+        },
+    ),
 )
+
+/** currentTrack n'est plus un champ séparé — toujours dérivé de queue/currentIndex, donc jamais désynchronisé */
+export function useCurrentTrack(): Track | null {
+    return usePlayerStore((state) => state.queue[state.currentIndex] ?? null)
+}

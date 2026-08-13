@@ -21,6 +21,8 @@ import { AdminDashboardPage } from './features/admin/presentation/pages/admin-da
 import { AdminUsersPage } from './features/admin/presentation/pages/admin-users-page'
 import { AdminModerationPage } from './features/admin/presentation/pages/admin-moderation-page'
 import { PremiumPage } from './features/premium/presentation/pages/premium-page'
+import {PreferencesPage} from "./features/settings/presentation/pages/preferences-page.tsx";
+import {PasswordPage} from "./features/settings/presentation/pages/password-page.tsx";
 
 function App() {
   return (
@@ -41,6 +43,10 @@ function App() {
             <Route path="/queue" element={<QueuePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+
+            <Route path="/settings/preferences" element={<PreferencesPage />} />
+            <Route path="/settings/password" element={<PasswordPage />} />
+
             <Route path="/history" element={<ListeningHistoryPage />} />
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/admin" element={<AdminDashboardPage />} />

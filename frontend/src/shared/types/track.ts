@@ -8,4 +8,5 @@ export interface Track {
     duration: number
     coverUrl?: string
     playCount?: number
+    fileUrl: string
 }

@@ -12,8 +12,8 @@ const MOCK_ARTIST: ArtistProfile = {
 }
 
 const MOCK_TRACKS: Track[] = [
-    { id: 't1', title: 'Midnight Drive', artistName: 'Nova Kline', artistId: 'a1', albumTitle: 'Neon Static', albumId: 'album-1', duration: 222, playCount: 15420 },
-    { id: 't2', title: 'Static Bloom', artistName: 'Nova Kline', artistId: 'a1', albumTitle: 'Neon Static', albumId: 'album-1', duration: 198, playCount: 9800 },
+    { id: 't1', title: 'Midnight Drive', artistName: 'Nova Kline', artistId: 'a1', albumTitle: 'Neon Static', albumId: 'album-1', duration: 222, playCount: 15420, fileUrl: '' },
+    { id: 't2', title: 'Static Bloom', artistName: 'Nova Kline', artistId: 'a1', albumTitle: 'Neon Static', albumId: 'album-1', duration: 198, playCount: 9800, fileUrl: '' },
 ]
 
 const MOCK_ALBUMS: Album[] = [
