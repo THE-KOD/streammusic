@@ -7,6 +7,7 @@ import { AlbumsSection } from '../components/albums-section'
 import { LoadingState, EmptyState } from '../../../../shared/components/states'
 import { useArtistProfile } from '../hooks/use-artist-profile'
 import { useFollowArtist } from '../../../follows'
+import {useLikedTrackIds} from "../../../favorites";
 
 export function ArtistProfilePage() {
   const { artistId } = useParams()
@@ -15,11 +16,7 @@ export function ArtistProfilePage() {
   const follow = useFollowArtist(artistId ?? '', false)
 
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
-  const [likedTrackIds, setLikedTrackIds] = useState<string[]>([])
-
-  const handleToggleLike = (trackId: string) => {
-    setLikedTrackIds((prev) => (prev.includes(trackId) ? prev.filter((id) => id !== trackId) : [...prev, trackId]))
-  }
+    const { likedTrackIds, toggleLike } = useLikedTrackIds()
 
   if (isLoading) return <LoadingState />
   if (!artist) {
@@ -41,7 +38,7 @@ export function ArtistProfilePage() {
         <PopularTracksSection
             tracks={tracks}
             onPlay={setPlayingTrackId}
-            onToggleLike={handleToggleLike}
+            onToggleLike={toggleLike}
             likedTrackIds={likedTrackIds}
             playingTrackId={playingTrackId ?? undefined}
         />

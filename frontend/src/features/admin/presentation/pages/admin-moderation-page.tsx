@@ -1,4 +1,3 @@
 export function AdminModerationPage() {
-  return <h1>AdminModerationPage</h1>;
+    return <h1>AdminModerationPage</h1>;
 }
-

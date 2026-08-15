@@ -24,6 +24,7 @@ import { PremiumPage } from './features/premium/presentation/pages/premium-page'
 import {PreferencesPage} from "./features/settings/presentation/pages/preferences-page.tsx";
 import {PasswordPage} from "./features/settings/presentation/pages/password-page.tsx";
 
+
 function App() {
   return (
       <>
@@ -55,8 +56,11 @@ function App() {
             <Route path="/premium" element={<PremiumPage />} />
           </Route>
 
+
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+
         <ToastContainer />
       </>
   )

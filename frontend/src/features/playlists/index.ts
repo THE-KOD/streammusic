@@ -1,2 +1,1 @@
-export {};
-
+export type { Playlist, PlaylistTrack } from './domain/playlist.entity'

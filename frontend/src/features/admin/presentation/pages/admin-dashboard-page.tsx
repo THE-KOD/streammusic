@@ -1,4 +1,3 @@
 export function AdminDashboardPage() {
-  return <h1>AdminDashboardPage</h1>;
+    return <h1>AdminDashboardPage</h1>;
 }
-

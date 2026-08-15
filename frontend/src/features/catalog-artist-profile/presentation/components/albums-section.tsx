@@ -1,5 +1,5 @@
 import { SectionHeader } from '../../../home/presentation/components/section-header'
-import { AlbumCard } from '../../../../shared/components/album-card'
+import { AlbumCardWithSave } from './album-card-with-save'
 import { EmptyState } from '../../../../shared/components/states'
 import type { Album } from '../../../../shared/types/album'
 
@@ -17,7 +17,7 @@ export function AlbumsSection({ albums, onAlbumClick }: AlbumsSectionProps) {
             <SectionHeader title="Albums" />
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {albums.map((album) => (
-                    <AlbumCard key={album.id} {...album} showArtist={false} onClick={() => onAlbumClick?.(album.id)} />
+                    <AlbumCardWithSave key={album.id} album={album} showArtist={false} onClick={() => onAlbumClick?.(album.id)} />
                 ))}
             </div>
         </section>

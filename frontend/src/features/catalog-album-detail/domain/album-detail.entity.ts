@@ -5,4 +5,4 @@ export interface AlbumDetail extends Album {
     totalDuration: number
 }
 
-export type AlbumTrack = Pick<Track, 'id' | 'title' | 'duration'>
+export type AlbumTrack = Pick<Track, 'id' | 'title' | 'duration' | 'fileUrl'>

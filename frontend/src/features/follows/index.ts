@@ -1,2 +1,3 @@
 export { useFollowArtist } from './presentation/hooks/use-follow-artist'
-export type { FollowStatus } from './domain/follow.entity'
+export { useFollowedArtists } from './presentation/hooks/use-followed-artists'
+export type { FollowStatus, FollowedArtist } from './domain/follow.entity'
