@@ -1,10 +1,8 @@
+import type { Artist } from '../../../shared/types/artist'
+
 export interface FollowStatus {
     artistId: string
     isFollowing: boolean
 }
 
-export interface FollowedArtist {
-    id: string
-    name: string
-    imageUrl?: string
-}
+export type FollowedArtist = Artist
