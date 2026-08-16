@@ -8,7 +8,7 @@ interface UserRowProps {
     pseudo: string
     email: string
     isActive: boolean
-    joinedAt: string
+    joinedAt: Date
     onDetail: () => void
 }
 
@@ -21,14 +21,11 @@ export function UserRow({ pseudo, email, isActive, joinedAt, onDetail }: UserRow
             <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1fr_1fr_auto_auto] gap-2 md:gap-4 items-center">
                 <span className="font-body text-sm font-medium text-ivory truncate">{pseudo}</span>
                 <span className="font-body text-sm text-muted truncate hidden md:block">{email}</span>
-                <span className={clsx(
-                    'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    isActive ? 'bg-teal/10 text-teal' : 'bg-danger/10 text-danger'
-                )}>
-                    <span className={clsx('w-1.5 h-1.5 rounded-full', isActive ? 'bg-teal' : 'bg-danger')} />
+                <span className={clsx('inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium', isActive ? 'bg-teal/10 text-teal' : 'bg-danger/10 text-danger')}>
+          <span className={clsx('w-1.5 h-1.5 rounded-full', isActive ? 'bg-teal' : 'bg-danger')} />
                     {isActive ? 'ACTIF' : 'SUSPENDU'}
-                </span>
-                <span className="font-mono text-xs text-muted hidden md:block">{joinedAt}</span>
+        </span>
+                <span className="font-mono text-xs text-muted hidden md:block">{joinedAt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             </div>
             <Button variant="ghost" size="sm" onClick={onDetail} aria-label="Voir le détail" className="opacity-0 group-hover:opacity-100 transition-opacity">
                 <ChevronRight className="w-4 h-4 text-muted" />

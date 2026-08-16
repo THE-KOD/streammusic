@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router'
 import { Card } from '../../../../shared/components/card'
 import { Button } from '../../../../shared/components/button'
 import { LoadingState, ErrorState } from '../../../../shared/components/states'
-import { ConfirmModal } from '../components/confirm-modal'
-import { AdminPageHeader } from '../components/admin-page-header'
-import { useModerationTracks } from '../hooks/use-admin'
+import { ConfirmModal } from '../components/confirm-modal.tsx'
+import { AdminPageHeader } from '../components/admin-page-header.tsx'
+import { useModerationTracks } from '../hooks/use-admin-moderation'
 import { formatDuration } from '../../../../shared/utils/format-duration'
 import { Music, Calendar, Clock, Headphones, Tag, Album } from 'lucide-react'
 
@@ -147,11 +147,7 @@ export function AdminModerationDetailPage() {
                         <h3 className="font-display text-xs font-semibold text-muted uppercase tracking-wide mb-3">Fichier audio</h3>
                         <div className="flex-1 flex flex-col items-center justify-center gap-3 p-4 bg-surface-raised/30 rounded-xl border border-white/5">
                             <Music className="w-8 h-8 text-muted/40" />
-                            <p className="text-sm text-muted text-center">Le fichier audio est disponible</p>
-                            <Button variant="secondary" size="md" className="gap-2">
-                                <Headphones className="w-4 h-4" />
-                                Accéder au contenu audio
-                            </Button>
+                            <audio controls src={track.fileUrl} className="w-full" />
                         </div>
                     </Card>
                 </div>

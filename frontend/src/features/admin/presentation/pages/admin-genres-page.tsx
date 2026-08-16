@@ -8,12 +8,13 @@ import { Button } from '../../../../shared/components/button'
 import { LoadingState, ErrorState, EmptyState } from '../../../../shared/components/states'
 import { GenreFormModal } from '../components/genre-form-modal'
 import { ConfirmModal } from '../components/confirm-modal'
-import { useGenres } from '../hooks/use-admin'
+import { useAdminGenres } from '../hooks/use-admin-genres'
 import { Tag, Plus } from 'lucide-react'
+import {useToastStore} from "../../../../core/store/toast-store.ts";
 
 export function AdminGenresPage() {
     const navigate = useNavigate()
-    const { genres, isLoading, error, createGenre, updateGenre, deleteGenre } = useGenres()
+    const { genres, isLoading, error, createGenre, updateGenre, deleteGenre } = useAdminGenres()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [editingGenre, setEditingGenre] = useState<{ id: string; name: string } | null>(null)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -30,15 +31,20 @@ export function AdminGenresPage() {
         setEditingGenre(null)
     }
 
+
+    const showToast = useToastStore((state) => state.showToast)
+
     const handleDelete = async () => {
         if (!deleteGenreId) return
         setIsActionLoading(true)
         try {
             await deleteGenre(deleteGenreId)
-        } finally {
-            setIsActionLoading(false)
             setIsDeleteModalOpen(false)
             setDeleteGenreId(null)
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Suppression impossible.', 'error')
+        } finally {
+            setIsActionLoading(false)
         }
     }
 

@@ -7,7 +7,7 @@ import { Button } from '../../../../shared/components/button'
 import { LoadingState, ErrorState } from '../../../../shared/components/states'
 import { ConfirmModal } from '../components/confirm-modal'
 import { AdminPageHeader } from '../components/admin-page-header'
-import { useAdminUsers } from '../hooks/use-admin'
+import { useAdminUsers } from '../hooks/use-admin-users'
 import { User, Mail, Calendar, Shield, Crown } from 'lucide-react'
 
 export function AdminUserDetailPage() {
@@ -77,8 +77,12 @@ export function AdminUserDetailPage() {
                                 <span>{user.email}</span>
                             </div>
                             <div className="flex items-center gap-2 text-muted text-xs font-mono mt-1">
-                                <Calendar className="w-3.5 h-3.5" />
-                                <span>Inscrit le {user.joinedAt}</span>
+                                <Calendar className="w-3.5 h-3.5"/>
+                                <span>Inscrit le {user.joinedAt.toLocaleDateString('fr-FR', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric'
+                                })}</span>
                             </div>
                         </div>
                     </div>
