@@ -1,4 +1,5 @@
-import { useState } from 'react'
+// features/playlists/presentation/components/add-track-modal.tsx
+import { useState, useMemo } from 'react'
 import { Modal } from '../../../../shared/components/modal'
 import { Input } from '../../../../shared/components/input'
 import { Button } from '../../../../shared/components/button'
@@ -18,9 +19,15 @@ export function AddTrackModal({ isOpen, onClose, onAdd, existingTrackIds }: AddT
     const [isLoading, setIsLoading] = useState(false)
     const [selectedId, setSelectedId] = useState<string | null>(null)
 
-    const filteredTracks = CATALOG_TRACKS_MOCK
-        .filter((t) => t.title.toLowerCase().includes(query.toLowerCase()) || t.artistName.toLowerCase().includes(query.toLowerCase()))
-        .filter((t) => !existingTrackIds.includes(t.id))
+    const filteredTracks = useMemo(() => {
+        const q = query.toLowerCase().trim()
+        return CATALOG_TRACKS_MOCK
+            .filter((t) => !existingTrackIds.includes(t.id))
+            .filter((t) =>
+                t.title.toLowerCase().includes(q) ||
+                t.artistName.toLowerCase().includes(q)
+            )
+    }, [query, existingTrackIds])
 
     const handleAdd = async () => {
         if (!selectedId) return
@@ -38,24 +45,52 @@ export function AddTrackModal({ isOpen, onClose, onAdd, existingTrackIds }: AddT
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Ajouter un titre">
             <div className="flex flex-col gap-4">
-                <Input placeholder="Rechercher un titre..." value={query} onChange={(e) => setQuery(e.target.value)} disabled={isLoading} />
-                <div className="max-h-60 overflow-y-auto space-y-1">
+                <Input
+                    placeholder="Rechercher un titre ou un artiste..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                />
+                <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
                     {filteredTracks.length === 0 ? (
-                        <p className="text-sm text-muted text-center py-4">Aucun titre disponible</p>
+                        <p className="text-sm text-muted text-center py-6">
+                            {query ? 'Aucun titre trouvé' : 'Aucun titre disponible à ajouter'}
+                        </p>
                     ) : (
                         filteredTracks.map((track) => (
-                            <Card key={track.id} className={`cursor-pointer transition-colors ${selectedId === track.id ? 'bg-surface-raised border-teal' : ''}`} onClick={() => setSelectedId(track.id)}>
+                            <Card
+                                key={track.id}
+                                className={`cursor-pointer transition-all duration-150 ${
+                                    selectedId === track.id ? 'border-teal bg-surface-raised' : 'border-white/5 hover:bg-surface-raised/60'
+                                }`}
+                                onClick={() => setSelectedId(track.id)}
+                            >
                                 <div className="flex items-center justify-between">
-                                    <div><p className="font-body text-ivory">{track.title}</p><p className="text-sm text-muted">{track.artistName}</p></div>
-                                    <span className="font-mono text-xs text-muted">{formatDuration(track.duration)}</span>
+                                    <div className="min-w-0">
+                                        <p className="font-body text-ivory truncate">{track.title}</p>
+                                        <p className="text-sm text-muted truncate">{track.artistName}</p>
+                                    </div>
+                                    <span className="font-mono text-xs text-muted ml-4">
+                    {formatDuration(track.duration)}
+                  </span>
                                 </div>
                             </Card>
                         ))
                     )}
                 </div>
-                <div className="flex justify-end gap-3">
-                    <Button variant="ghost" size="md" onClick={onClose} disabled={isLoading}>Annuler</Button>
-                    <Button variant="primary" size="md" onClick={handleAdd} disabled={!selectedId || isLoading}>{isLoading ? 'Ajout...' : 'Ajouter'}</Button>
+                <div className="flex justify-end gap-3 border-t border-white/5 pt-4">
+                    <Button variant="ghost" size="md" onClick={onClose} disabled={isLoading}>
+                        Annuler
+                    </Button>
+                    <Button
+                        variant="primary"
+                        size="md"
+                        onClick={handleAdd}
+                        disabled={!selectedId || isLoading}
+                    >
+                        {isLoading ? 'Ajout...' : 'Ajouter'}
+                    </Button>
                 </div>
             </div>
         </Modal>

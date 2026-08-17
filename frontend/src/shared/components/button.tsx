@@ -1,3 +1,4 @@
+// src/shared/components/button.tsx
 import { type ButtonHTMLAttributes } from 'react'
 import clsx from 'clsx'
 
@@ -10,10 +11,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-    primary: 'bg-amber text-ink hover:brightness-110 font-medium',
-    secondary: 'bg-surface-raised text-ivory hover:bg-surface border border-white/10',
+    primary: 'bg-amber text-ink hover:brightness-110 font-medium shadow-sm shadow-amber/10',
+    secondary: 'bg-surface-raised text-ivory hover:bg-surface border border-white/10 shadow-sm',
     ghost: 'bg-transparent text-muted hover:text-ivory',
-    danger: 'bg-danger text-ivory hover:brightness-110 font-medium',
+    danger: 'bg-danger text-ivory hover:brightness-110 font-medium shadow-sm shadow-danger/10',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -26,7 +27,8 @@ export function Button({ variant = 'primary', size = 'md', className, ...props }
     return (
         <button
             className={clsx(
-                'font-body inline-flex items-center justify-center gap-2 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed',
+                'font-body inline-flex items-center justify-center gap-2 transition-all duration-150',
+                'disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97]',
                 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal focus-visible:outline-offset-2',
                 variantClasses[variant],
                 sizeClasses[size],

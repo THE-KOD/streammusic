@@ -1,3 +1,4 @@
+// features/catalog-artist-profile/presentation/components/popular-tracks-section.tsx
 import { SectionHeader } from '../../../home/presentation/components/section-header'
 import { TrackRow } from '../../../../shared/components/track-row'
 import { EmptyState } from '../../../../shared/components/states'
@@ -13,10 +14,15 @@ interface PopularTracksSectionProps {
 
 export function PopularTracksSection({ tracks, onPlay, onToggleLike, likedTrackIds = [], playingTrackId }: PopularTracksSectionProps) {
     if (tracks.length === 0) {
-        return <section className="mb-8"><SectionHeader title="Titres populaires" /><EmptyState message="Aucun titre populaire disponible." /></section>
+        return (
+            <section className="mb-8">
+                <SectionHeader title="Titres populaires" />
+                <EmptyState message="Aucun titre populaire disponible." />
+            </section>
+        )
     }
     return (
-        <section className="mb-8">
+        <section className="mb-8 bg-surface/40 backdrop-blur-sm rounded-xl p-4 border border-white/5 animate-fade-in">
             <SectionHeader title="Titres populaires" />
             <div className="space-y-1">
                 {tracks.map((track, index) => (

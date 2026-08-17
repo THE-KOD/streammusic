@@ -1,3 +1,4 @@
+// features/search/presentation/components/album-card-with-save.tsx
 import { AlbumCard } from '../../../../shared/components/album-card'
 import { useAlbumSave } from '../../../favorites'
 import type { Album } from '../../../../shared/types/album'
@@ -8,7 +9,15 @@ interface AlbumCardWithSaveProps {
     onClick: () => void
 }
 
-export function AlbumCardWithSave({ album, showArtist, onClick }: AlbumCardWithSaveProps) {
+export function AlbumCardWithSave({ album, showArtist = true, onClick }: AlbumCardWithSaveProps) {
     const { isSaved, toggle } = useAlbumSave(album.id)
-    return <AlbumCard {...album} showArtist={showArtist} isSaved={isSaved} onToggleSave={toggle} onClick={onClick} />
+    return (
+        <AlbumCard
+            {...album}
+            showArtist={showArtist}
+            isSaved={isSaved}
+            onToggleSave={toggle}
+            onClick={onClick}
+        />
+    )
 }

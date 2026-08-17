@@ -16,20 +16,62 @@
     --font-mono: "IBM Plex Mono", monospace;
 }
 
+/* Fond avec dégradé très subtil */
 body {
-    background-color: var(--color-ink);
+    background: radial-gradient(ellipse at 50% 0%, #1D222B 0%, var(--color-ink) 100%);
     color: var(--color-ivory);
     font-family: var(--font-body);
+    min-height: 100vh;
+    margin: 0;
+    transition: background 0.3s ease;
 }
 
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-surface-raised);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
+}
+
+/* Animations réutilisables */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 @keyframes eq {
-    0%, 100% { transform: scaleY(0.4); }
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+.animate-slide-up {
+    animation: slideUp 0.25s ease-out forwards;
+}
+
+/* Spinner égaliseur – amélioré */
+@keyframes eqBar {
+    0%, 100% { transform: scaleY(0.3); }
     50% { transform: scaleY(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .animate-\[eq_0\.8s_ease-in-out_infinite\] {
-        animation: none;
+    .animate-eq {
+        animation: none !important;
         transform: scaleY(0.7);
     }
 }

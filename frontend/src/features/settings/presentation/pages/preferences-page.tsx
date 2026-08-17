@@ -1,3 +1,4 @@
+// features/settings/presentation/pages/preferences-page.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { PageHeader } from '../../../../shared/components/page-header'
@@ -30,14 +31,25 @@ export function PreferencesPage() {
     if (!user) return null
 
     return (
-        <div>
-            <PageHeader title="Préférences" backTo="/settings" />
-            <h2 className="font-display text-lg font-semibold text-ivory mb-1">Vos genres musicaux</h2>
-            <p className="text-sm text-muted mb-4">Sélectionnez les genres que vous souhaitez écouter.</p>
-            <GenreSelector genres={allGenres} selected={selectedGenres} onChange={setSelectedGenres} disabled={isSaving} />
-            <div className="mt-6">
+        <div className="space-y-6">
+            <PageHeader title="Préférences" subtitle="Personnalisez votre expérience musicale" backTo="/settings" />
+
+            <div className="p-5 rounded-xl bg-surface/40 backdrop-blur-sm border border-white/5">
+                <h2 className="font-display text-lg font-semibold text-ivory mb-1">Vos genres musicaux</h2>
+                <p className="text-sm text-muted mb-5">
+                    Sélectionnez les genres que vous aimez pour des recommandations personnalisées.
+                </p>
+                <GenreSelector
+                    genres={allGenres}
+                    selected={selectedGenres}
+                    onChange={setSelectedGenres}
+                    disabled={isSaving}
+                />
+            </div>
+
+            <div className="flex justify-end">
                 <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
-                    {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+                    {isSaving ? 'Enregistrement...' : 'Enregistrer les préférences'}
                 </Button>
             </div>
         </div>

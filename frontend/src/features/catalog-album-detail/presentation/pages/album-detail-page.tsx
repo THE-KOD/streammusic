@@ -1,3 +1,4 @@
+// features/catalog-album-detail/presentation/pages/album-detail-page.tsx
 import { useParams, useNavigate } from 'react-router'
 import { AlbumHero } from '../components/album-hero'
 import { AlbumActions } from '../components/album-actions'
@@ -39,7 +40,7 @@ export function AlbumDetailPage() {
     const playableQueue = tracks.map(toPlayableTrack)
 
     return (
-        <>
+        <div className="space-y-8">
             <AlbumHero
                 title={album.title}
                 artistName={album.artistName ?? 'Artiste inconnu'}
@@ -49,9 +50,14 @@ export function AlbumDetailPage() {
                 onArtistClick={album.artistId ? () => navigate(`/artists/${album.artistId}`) : undefined}
             />
 
-            <AlbumActions trackCount={tracks.length} onPlayAll={() => playableQueue.length > 0 && playTrack(playableQueue[0], playableQueue)} isSaved={isSaved} onToggleSave={toggle} />
+            <AlbumActions
+                trackCount={tracks.length}
+                onPlayAll={() => playableQueue.length > 0 && playTrack(playableQueue[0], playableQueue)}
+                isSaved={isSaved}
+                onToggleSave={toggle}
+            />
 
-            <section>
+            <section className="bg-surface/40 backdrop-blur-sm rounded-xl p-4 border border-white/5 animate-fade-in">
                 <SectionHeader title="Titres" />
                 {tracks.length === 0 ? (
                     <EmptyState message="Cet album ne contient aucun titre disponible." />
@@ -59,8 +65,13 @@ export function AlbumDetailPage() {
                     <div className="space-y-1">
                         {tracks.map((track, index) => (
                             <TrackRow
-                                key={track.id} index={index + 1} title={track.title} artistName={album.artistName ?? ''}
-                                duration={track.duration} showCover={false} showArtist={false}
+                                key={track.id}
+                                index={index + 1}
+                                title={track.title}
+                                artistName={album.artistName ?? ''}
+                                duration={track.duration}
+                                showCover={false}
+                                showArtist={false}
                                 isPlaying={isPlaying && currentTrack?.id === track.id}
                                 onPlay={() => playTrack(toPlayableTrack(track), playableQueue)}
                             />
@@ -68,6 +79,6 @@ export function AlbumDetailPage() {
                     </div>
                 )}
             </section>
-        </>
+        </div>
     )
 }

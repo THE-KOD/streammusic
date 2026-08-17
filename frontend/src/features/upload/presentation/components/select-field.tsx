@@ -1,4 +1,5 @@
-import { ChevronDown } from 'lucide-react'
+// features/upload/presentation/components/select-field.tsx
+import { ChevronDown, Check } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import clsx from 'clsx'
 
@@ -11,7 +12,7 @@ interface SelectFieldProps {
     label: string
     required?: boolean
     options: Option[]
-    value?: string // option id
+    value?: string
     onChange: (value: string) => void
     placeholder?: string
     disabled?: boolean
@@ -47,8 +48,9 @@ export function SelectField({
 
     return (
         <div className="flex flex-col gap-1.5" ref={containerRef}>
-            <label className="font-body text-sm text-ivory">
-                {label} {required && '*'}
+            <label className="font-body text-sm text-ivory flex items-center gap-1">
+                {label}
+                {required && <span className="text-danger text-xs font-medium">*</span>}
             </label>
             <div className="relative">
                 <button
@@ -56,34 +58,48 @@ export function SelectField({
                     onClick={() => !disabled && !isLoading && setIsOpen(!isOpen)}
                     disabled={disabled || isLoading}
                     className={clsx(
-                        'w-full bg-surface text-ivory rounded-lg px-3.5 py-2.5 text-sm',
-                        'border border-white/10 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal',
-                        'transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed',
-                        'flex items-center justify-between',
-                        error && 'border-danger focus:border-danger focus:ring-danger',
-                        !selected && 'text-muted'
+                        'w-full bg-surface text-ivory rounded-lg px-3.5 py-2.5 text-sm text-left',
+                        'border transition-all duration-150',
+                        'focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/30',
+                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'flex items-center justify-between gap-2',
+                        error ? 'border-danger focus:border-danger focus:ring-danger/30' : 'border-white/10',
+                        !selected && !error && 'text-muted'
                     )}
                 >
-                    <span>{selected ? selected.name : placeholder}</span>
-                    <ChevronDown className={clsx('w-4 h-4 text-muted transition-transform', isOpen && 'rotate-180')} />
+                    <span className="truncate">{selected ? selected.name : placeholder}</span>
+                    <ChevronDown className={clsx(
+                        'w-4 h-4 text-muted transition-transform duration-200 shrink-0',
+                        isOpen && 'rotate-180'
+                    )} />
                 </button>
+
                 {isOpen && (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-surface border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                    <div className="absolute left-0 right-0 top-full mt-1 bg-surface border border-white/10 rounded-lg shadow-xl max-h-56 overflow-y-auto z-20 animate-fade-in">
                         {isLoading ? (
-                            <div className="px-4 py-2 text-sm text-muted">Chargement...</div>
+                            <div className="px-4 py-3 text-sm text-muted text-center">Chargement...</div>
                         ) : options.length === 0 ? (
-                            <div className="px-4 py-2 text-sm text-muted">Aucune option</div>
+                            <div className="px-4 py-3 text-sm text-muted text-center">Aucune option disponible</div>
                         ) : (
-                            options.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    type="button"
-                                    onClick={() => { onChange(opt.id); setIsOpen(false) }}
-                                    className="w-full text-left px-4 py-2 text-sm text-ivory hover:bg-surface-raised transition-colors"
-                                >
-                                    {opt.name}
-                                </button>
-                            ))
+                            options.map(opt => {
+                                const isSelected = opt.id === value
+                                return (
+                                    <button
+                                        key={opt.id}
+                                        type="button"
+                                        onClick={() => { onChange(opt.id); setIsOpen(false) }}
+                                        className={clsx(
+                                            'w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between',
+                                            isSelected
+                                                ? 'bg-teal/10 text-ivory'
+                                                : 'text-ivory hover:bg-surface-raised'
+                                        )}
+                                    >
+                                        <span>{opt.name}</span>
+                                        {isSelected && <Check className="w-4 h-4 text-teal" />}
+                                    </button>
+                                )
+                            })
                         )}
                     </div>
                 )}

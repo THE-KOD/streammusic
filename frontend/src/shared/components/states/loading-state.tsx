@@ -1,9 +1,10 @@
-import { Spinner } from '../spinner'
+import {Spinner} from "../spinner.tsx";
 
-export function LoadingState() {
+export function LoadingState({ message = 'Chargement...' }: { message?: string }) {
     return (
-        <div className="flex justify-center items-center py-12">
+        <div className="flex flex-col items-center justify-center py-12 gap-3">
             <Spinner size="md" />
+            <p className="text-sm text-muted">{message}</p>
         </div>
     )
 }

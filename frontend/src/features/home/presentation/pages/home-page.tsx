@@ -1,3 +1,4 @@
+// features/home/presentation/pages/home-page.tsx
 import { Greeting } from '../components/greeting'
 import { SectionHeader } from '../components/section-header'
 import { TrackCard } from '../../../../shared/components/track-card'
@@ -6,6 +7,7 @@ import { useHomeSections } from '../hooks/use-home-sections'
 import { usePlayerStore, useCurrentTrack } from '../../../player/presentation/store/player-store'
 import type { Track } from '../../../../shared/types/track'
 
+// ── TrackGrid (inchangé) ──
 function TrackGrid({ tracks }: { tracks: Track[] }) {
     const playTrack = usePlayerStore((state) => state.playTrack)
     const currentTrack = useCurrentTrack()
@@ -25,33 +27,59 @@ function TrackGrid({ tracks }: { tracks: Track[] }) {
     )
 }
 
+// ── Composant Section interne (pour éviter la duplication) ──
+function Section({
+                     title,
+                     subtitle,
+                     seeMoreLink,
+                     state,
+                     children,
+                 }: {
+    title: string
+    subtitle?: string
+    seeMoreLink?: string
+    state: { isLoading: boolean; error: string | null; data: Track[] }
+    children: React.ReactNode
+}) {
+    const { isLoading, error, data } = state
+
+    return (
+        <section className="bg-surface/40 backdrop-blur-sm rounded-xl p-4 border border-white/5 animate-fade-in">
+            <SectionHeader title={title} subtitle={subtitle} seeMoreLink={seeMoreLink} />
+
+            {isLoading && <LoadingState />}
+            {error && <ErrorState message={error} />}
+            {!isLoading && !error && data.length === 0 && (
+                <EmptyState message="Aucun élément à afficher pour le moment." />
+            )}
+            {!isLoading && !error && data.length > 0 && children}
+        </section>
+    )
+}
+
+// ── Page principale ──
 export function HomePage() {
     const { popular, newReleases, recommendations } = useHomeSections()
 
     return (
-        <>
+        <div className="space-y-8">
             <Greeting pseudo="Utilisateur" />
-            <section className="mb-8">
-                <SectionHeader title="Titres populaires" />
-                {popular.isLoading && <LoadingState />}
-                {popular.error && <ErrorState message={popular.error} />}
-                {!popular.isLoading && !popular.error && popular.data.length === 0 && <EmptyState message="Aucun titre populaire pour le moment." />}
-                {!popular.isLoading && !popular.error && popular.data.length > 0 && <TrackGrid tracks={popular.data} />}
-            </section>
-            <section className="mb-8">
-                <SectionHeader title="Nouveautés" />
-                {newReleases.isLoading && <LoadingState />}
-                {newReleases.error && <ErrorState message={newReleases.error} />}
-                {!newReleases.isLoading && !newReleases.error && newReleases.data.length === 0 && <EmptyState message="Aucune nouveauté pour le moment." />}
-                {!newReleases.isLoading && !newReleases.error && newReleases.data.length > 0 && <TrackGrid tracks={newReleases.data} />}
-            </section>
-            <section className="mb-8">
-                <SectionHeader title="Pour vous" subtitle="Basé sur votre activité d'écoute" />
-                {recommendations.isLoading && <LoadingState />}
-                {recommendations.error && <ErrorState message={recommendations.error} />}
-                {!recommendations.isLoading && !recommendations.error && recommendations.data.length === 0 && <EmptyState message="Nous n'avons pas encore assez d'écoute pour personnaliser vos recommandations." />}
-                {!recommendations.isLoading && !recommendations.error && recommendations.data.length > 0 && <TrackGrid tracks={recommendations.data} />}
-            </section>
-        </>
+
+            <Section title="Titres populaires" state={popular}>
+                <TrackGrid tracks={popular.data} />
+            </Section>
+
+            <Section title="Nouveautés" state={newReleases}>
+                <TrackGrid tracks={newReleases.data} />
+            </Section>
+
+            <Section
+                title="Pour vous"
+                subtitle="Basé sur votre activité d'écoute"
+                state={recommendations}
+            >
+                <TrackGrid tracks={recommendations.data} />
+            </Section>
+        </div>
     )
 }

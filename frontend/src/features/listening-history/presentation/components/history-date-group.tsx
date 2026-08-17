@@ -25,8 +25,8 @@ function formatDateLabel(date: Date): string {
 
 export function HistoryDateGroup({ date, entries, onPlay }: HistoryDateGroupProps) {
     return (
-        <div className="mb-6">
-            <h3 className="font-body text-sm font-semibold uppercase tracking-wide text-muted mb-3">
+        <div className="space-y-2">
+            <h3 className="font-body text-xs font-semibold uppercase tracking-wider text-muted/70 border-b border-white/5 pb-2">
                 {formatDateLabel(date)}
             </h3>
             <div className="space-y-1">
