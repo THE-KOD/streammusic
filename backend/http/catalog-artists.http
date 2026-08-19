@@ -1,0 +1,46 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Lister les artistes (public)
+GET {{baseUrl}}/artists
+
+### 2. Devenir artiste avec le compte connecté
+POST {{baseUrl}}/artists/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "biographie": "Artiste basé à Lomé, passionné d'afrobeat.",
+  "photoArtisteUrl": "https://cdn.example.com/artists/moi.jpg"
+}
+
+### 3. Devenir artiste une seconde fois — doit renvoyer 409
+POST {{baseUrl}}/artists/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "biographie": "Nouvelle tentative"
+}
+
+### 4. Consulter la fiche (remplace ARTIST_ID par l'id reçu à l'étape 2)
+GET {{baseUrl}}/artists/ARTIST_ID
+
+### 5. Modifier son propre profil
+PATCH {{baseUrl}}/artists/ARTIST_ID
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "biographie": "Bio mise à jour"
+}
+
+### 6. Sans token — doit renvoyer 401
+POST {{baseUrl}}/artists/me
+Content-Type: {{contentType}}
+
+{
+  "biographie": "Test"
+}
