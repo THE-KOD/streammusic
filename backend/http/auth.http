@@ -1,0 +1,65 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Inscription
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "pseudo": "jane_doe",
+  "email": "jane@example.com",
+  "motDePasse": "motDePasseSecurise123"
+}
+
+### 2. Inscription — email déjà utilisé (doit renvoyer 409)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "pseudo": "autre_pseudo",
+  "email": "jane@example.com",
+  "motDePasse": "motDePasseSecurise123"
+}
+
+### 3. Inscription — validation invalide (doit renvoyer 400)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "pseudo": "ab",
+  "email": "pas-un-email",
+  "motDePasse": "123"
+}
+
+### 4. Connexion
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "jane@example.com",
+  "motDePasse": "motDePasseSecurise123"
+}
+
+### 5. Connexion — mauvais mot de passe (doit renvoyer 401)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "jane@example.com",
+  "motDePasse": "mauvais-mot-de-passe"
+}
+
+### 6. Rafraîchir les tokens
+# Remplace REFRESH_TOKEN_ICI par la valeur reçue à l'étape 4
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "REFRESH_TOKEN_ICI"
+}
+
+### 7. Déconnexion (nécessite un access token valide)
+# Remplace ACCESS_TOKEN_ICI par la valeur reçue à l'étape 4
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer ACCESS_TOKEN_ICI

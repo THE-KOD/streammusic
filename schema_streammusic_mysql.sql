@@ -3,15 +3,6 @@
 -- Version corrigée suite à l'audit écrans <-> schéma
 -- Corrections apportées : OAuth, date_sortie/pochette sur titre,
 -- album_favori, préférences, session, statut_compte
---
--- NOTE IMPORTANTE SUR LES UUID :
--- MySQL interdit UUID() comme valeur DEFAULT (fonction non
--- déterministe), contrairement à PostgreSQL. Les colonnes id
--- n'ont donc plus de DEFAULT ici. Deux options pour peupler id :
---   1) Générer l'UUID côté application avant l'INSERT (recommandé
---      pour maîtriser le cycle de vie de l'objet côté backend).
---   2) S'appuyer sur les triggers BEFORE INSERT fournis en fin de
---      script, qui génèrent id = UUID() si non fourni par l'appli.
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS streammusic
@@ -23,7 +14,7 @@ USE streammusic;
 -- ============================================================
 
 CREATE TABLE utilisateur (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     pseudo              VARCHAR(50)  NOT NULL UNIQUE,
     email               VARCHAR(255) NOT NULL UNIQUE,
     -- GAP 1 : nullable pour permettre un compte créé uniquement via OAuth
@@ -66,7 +57,7 @@ CREATE TABLE utilisateur_genre_prefere (
 
 -- GAP 5 : sessions pour permettre la révocation réelle du refresh token
 CREATE TABLE session (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id      CHAR(36) NOT NULL,
     refresh_token_hash  VARCHAR(255) NOT NULL,
     date_creation       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -80,10 +71,10 @@ CREATE TABLE session (
 -- ============================================================
 
 CREATE TABLE abonnement (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id      CHAR(36) NOT NULL UNIQUE,
     type                ENUM('GRATUIT','PREMIUM') NOT NULL DEFAULT 'GRATUIT',
-    date_debut          DATE NOT NULL,
+    date_debut          DATE NOT NULL DEFAULT (CURRENT_DATE),
     date_fin            DATE NULL,
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE,
     CONSTRAINT chk_dates_abonnement CHECK (date_fin IS NULL OR date_fin >= date_debut)
@@ -94,7 +85,7 @@ CREATE TABLE abonnement (
 -- ============================================================
 
 CREATE TABLE genre (
-    id      CHAR(36) PRIMARY KEY,
+    id      CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     nom     VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -104,7 +95,7 @@ ALTER TABLE utilisateur_genre_prefere
     ADD FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE;
 
 CREATE TABLE album (
-    id              CHAR(36) PRIMARY KEY,
+    id              CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     artiste_id      CHAR(36) NOT NULL,
     titre           VARCHAR(255) NOT NULL,
     pochette_url    VARCHAR(500),
@@ -113,7 +104,7 @@ CREATE TABLE album (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE titre (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     album_id            CHAR(36) NULL,          -- nullable : single sans album
     artiste_id          CHAR(36) NOT NULL,
     genre_id            CHAR(36) NOT NULL,
@@ -141,7 +132,7 @@ CREATE TABLE titre (
 -- ============================================================
 
 CREATE TABLE playlist (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     proprietaire_id     CHAR(36) NOT NULL,
     nom                 VARCHAR(100) NOT NULL,
     visibilite          ENUM('PUBLIQUE','PRIVEE') NOT NULL DEFAULT 'PRIVEE',
@@ -196,7 +187,7 @@ CREATE TABLE suivi (
 -- ============================================================
 
 CREATE TABLE historique_ecoute (
-    id              CHAR(36) PRIMARY KEY,
+    id              CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id  CHAR(36) NOT NULL,
     titre_id        CHAR(36) NOT NULL,
     date_ecoute     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -207,7 +198,7 @@ CREATE TABLE historique_ecoute (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE file_attente (
-    id              CHAR(36) PRIMARY KEY,
+    id              CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id  CHAR(36) NOT NULL UNIQUE,
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -226,7 +217,7 @@ CREATE TABLE file_attente_titre (
 -- ============================================================
 
 CREATE TABLE notification (
-    id              CHAR(36) PRIMARY KEY,
+    id              CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id  CHAR(36) NOT NULL,
     titre_id        CHAR(36) NULL,
     type            ENUM('NOUVELLE_SORTIE','SYSTEME') NOT NULL,
@@ -238,7 +229,7 @@ CREATE TABLE notification (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE suggestion (
-    id                  CHAR(36) PRIMARY KEY,
+    id                  CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     utilisateur_id      CHAR(36) NOT NULL,
     titre_id            CHAR(36) NOT NULL,
     score               DECIMAL(5,4) NOT NULL,
@@ -266,105 +257,6 @@ CREATE INDEX idx_suggestion_utilisateur  ON suggestion (utilisateur_id);
 -- Index partiel non supporté en MySQL : composite classique à la place
 CREATE INDEX idx_notification_lu         ON notification (utilisateur_id, lu);
 CREATE INDEX idx_session_utilisateur     ON session (utilisateur_id, revoque);
-
--- ============================================================
--- 9. TRIGGERS — génération d'UUID si non fourni par l'application
--- ============================================================
-
-DELIMITER //
-
-CREATE TRIGGER trg_utilisateur_uuid BEFORE INSERT ON utilisateur
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_session_uuid BEFORE INSERT ON session
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_abonnement_uuid BEFORE INSERT ON abonnement
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-    IF NEW.date_debut IS NULL THEN
-        SET NEW.date_debut = CURDATE();
-    END IF;
-END//
-
-CREATE TRIGGER trg_genre_uuid BEFORE INSERT ON genre
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_album_uuid BEFORE INSERT ON album
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_titre_uuid BEFORE INSERT ON titre
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_playlist_uuid BEFORE INSERT ON playlist
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_historique_uuid BEFORE INSERT ON historique_ecoute
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_file_attente_uuid BEFORE INSERT ON file_attente
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_notification_uuid BEFORE INSERT ON notification
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-CREATE TRIGGER trg_suggestion_uuid BEFORE INSERT ON suggestion
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
-DELIMITER ;
 
 -- ============================================================
 -- FIN DU SCRIPT

@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { envValidationSchema } from './infrastructure/config/env.validation';
+import { DatabaseModule } from './infrastructure/database/database.module';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -21,7 +25,13 @@ import { AdminModule } from './features/admin/admin.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: envValidationSchema,
+    }),
+    DatabaseModule,
     AuthModule,
+    UsersModule,
     UsersModule,
     GenresModule,
     ArtistsModule,
