@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { DecodedToken, TokenGenerator } from '../domain/token-generator';
 import { AuthTokens } from '../domain/auth.types';
 
@@ -14,17 +14,14 @@ export class JwtTokenGenerator implements TokenGenerator {
 
     generateTokens(utilisateurId: string): AuthTokens {
         const accessToken = this.jwtService.sign(
-            { sub: utilisateurId },
+            { sub: utilisateurId, jti: randomUUID() },
             {
                 secret: this.config.get<string>('JWT_ACCESS_SECRET'),
-                // Cast sûr : JWT_ACCESS_EXPIRATION est déjà validé par Joi au démarrage
-                // (format "15m"/"7d"...) — ConfigService.get<string>() nous fait perdre
-                // ce typage précis en le renvoyant comme string générique.
                 expiresIn: this.config.get<string>('JWT_ACCESS_EXPIRATION') as JwtSignOptions['expiresIn'],
             },
         );
         const refreshToken = this.jwtService.sign(
-            { sub: utilisateurId },
+            { sub: utilisateurId, jti: randomUUID() },
             {
                 secret: this.config.get<string>('JWT_REFRESH_SECRET'),
                 expiresIn: this.config.get<string>('JWT_REFRESH_EXPIRATION') as JwtSignOptions['expiresIn'],
@@ -45,16 +42,16 @@ export class JwtTokenGenerator implements TokenGenerator {
         return createHash('sha256').update(token).digest('hex');
     }
 
+    getRefreshTokenExpiration(token: string): Date {
+        const decoded = this.jwtService.decode(token) as { exp: number };
+        return new Date(decoded.exp * 1000);
+    }
+
     private verify(token: string, secret: string): DecodedToken | null {
         try {
             return this.jwtService.verify<DecodedToken>(token, { secret });
         } catch {
             return null;
         }
-    }
-
-    getRefreshTokenExpiration(token: string): Date {
-        const decoded = this.jwtService.decode(token) as { exp: number };
-        return new Date(decoded.exp * 1000);
     }
 }

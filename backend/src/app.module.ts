@@ -27,6 +27,7 @@ import { AdminModule } from './features/admin/admin.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
       validationSchema: envValidationSchema,
     }),
     DatabaseModule,
