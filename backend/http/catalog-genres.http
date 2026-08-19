@@ -1,0 +1,49 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Lister les genres (public, pas de token)
+GET {{baseUrl}}/genres
+
+### 2. Créer un genre
+POST {{baseUrl}}/genres
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nom": "Afrobeat"
+}
+
+### 3. Créer un doublon — doit renvoyer 409
+POST {{baseUrl}}/genres
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nom": "Afrobeat"
+}
+
+### 4. Consulter un genre (remplace GENRE_ID par l'id reçu à l'étape 2)
+GET {{baseUrl}}/genres/GENRE_ID
+
+### 5. Renommer un genre
+PATCH {{baseUrl}}/genres/GENRE_ID
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nom": "Afrobeat Fusion"
+}
+
+### 6. Supprimer un genre
+DELETE {{baseUrl}}/genres/GENRE_ID
+Authorization: Bearer {{accessToken}}
+
+### 7. Sans token — doit renvoyer 401
+POST {{baseUrl}}/genres
+Content-Type: {{contentType}}
+
+{
+  "nom": "Test"
+}
