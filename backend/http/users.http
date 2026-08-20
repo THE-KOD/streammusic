@@ -1,0 +1,39 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+# Colle un access token obtenu via auth.http (POST /auth/login)
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Consulter son profil
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{accessToken}}
+
+### 2. Modifier son pseudo
+PATCH {{baseUrl}}/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "pseudo": "jane_updated"
+}
+
+### 3. Modifier sa photo de profil
+PATCH {{baseUrl}}/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "photoProfilUrl": "https://cdn.example.com/avatars/jane.jpg"
+}
+
+### 4. Sans token — doit renvoyer 401
+GET {{baseUrl}}/users/me
+
+### 5. Pseudo déjà utilisé — doit renvoyer 409
+PATCH {{baseUrl}}/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "pseudo": "un_pseudo_deja_pris_par_un_autre_compte"
+}
