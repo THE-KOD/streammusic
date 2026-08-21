@@ -1,0 +1,56 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Lister tous les albums (public)
+GET {{baseUrl}}/albums
+
+### 2. Filtrer par artiste
+GET {{baseUrl}}/albums?artisteId=ARTIST_ID
+
+### 3. Créer un album (le compte doit déjà avoir un profil artiste — voir catalog-artists.http)
+POST {{baseUrl}}/albums
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Neon Static",
+  "dateSortie": "2026-03-14",
+  "pochetteUrl": "https://cdn.example.com/albums/neon-static.jpg"
+}
+
+### 4. Date invalide — doit renvoyer 400
+POST {{baseUrl}}/albums
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Album invalide",
+  "dateSortie": "pas-une-date"
+}
+
+### 5. Consulter un album (remplace ALBUM_ID)
+GET {{baseUrl}}/albums/ALBUM_ID
+
+### 6. Modifier un album
+PATCH {{baseUrl}}/albums/ALBUM_ID
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Neon Static (Deluxe)"
+}
+
+### 7. Supprimer un album
+DELETE {{baseUrl}}/albums/ALBUM_ID
+Authorization: Bearer {{accessToken}}
+
+### 8. Sans token — doit renvoyer 401
+POST {{baseUrl}}/albums
+Content-Type: {{contentType}}
+
+{
+  "titre": "Test",
+  "dateSortie": "2026-01-01"
+}
