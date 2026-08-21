@@ -1,0 +1,74 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Catalogue public (titres validés uniquement)
+GET {{baseUrl}}/tracks
+
+### 2. Filtrer par artiste
+GET {{baseUrl}}/tracks?artisteId=ARTIST_ID
+
+### 3. Mes titres, tous statuts confondus
+GET {{baseUrl}}/tracks/mine
+Authorization: Bearer {{accessToken}}
+
+### 4. Uploader un titre en single (pas d'albumId)
+POST {{baseUrl}}/tracks
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Midnight Drive",
+  "genreId": "GENRE_ID",
+  "duree": 222,
+  "fichierAudioUrl": "https://storage.example.com/tracks/midnight-drive.mp3",
+  "pochetteUrl": "https://cdn.example.com/tracks/midnight-drive.jpg"
+}
+
+### 5. Uploader un titre dans un album
+POST {{baseUrl}}/tracks
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Static Bloom",
+  "genreId": "GENRE_ID",
+  "albumId": "ALBUM_ID",
+  "duree": 198,
+  "fichierAudioUrl": "https://storage.example.com/tracks/static-bloom.mp3"
+}
+
+### 6. Consulter un titre
+GET {{baseUrl}}/tracks/TRACK_ID
+
+### 7. Modifier les métadonnées
+PATCH {{baseUrl}}/tracks/TRACK_ID
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Midnight Drive (Remix)"
+}
+
+### 8. Valider un titre (à faire avant qu'il apparaisse dans le catalogue public)
+PATCH {{baseUrl}}/tracks/TRACK_ID/moderer
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "statut": "VALIDE"
+}
+
+### 9. Rejeter un titre
+PATCH {{baseUrl}}/tracks/TRACK_ID/moderer
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "statut": "REJETE"
+}
+
+### 10. Supprimer un titre
+DELETE {{baseUrl}}/tracks/TRACK_ID
+Authorization: Bearer {{accessToken}}
