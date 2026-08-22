@@ -1,0 +1,19 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Consulter son abonnement (créé automatiquement à l'inscription)
+GET {{baseUrl}}/subscriptions/me
+Authorization: Bearer {{accessToken}}
+
+### 2. Passer en Premium
+POST {{baseUrl}}/subscriptions/me/upgrade
+Authorization: Bearer {{accessToken}}
+
+### 3. Revenir en Gratuit
+POST {{baseUrl}}/subscriptions/me/downgrade
+Authorization: Bearer {{accessToken}}
+
+### 4. Sans token — doit renvoyer 401
+GET {{baseUrl}}/subscriptions/me

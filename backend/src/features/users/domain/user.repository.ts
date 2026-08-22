@@ -5,6 +5,7 @@ export interface UtilisateurRepository {
     findByEmail(email: string): Promise<Utilisateur | null>;
     findByPseudo(pseudo: string): Promise<Utilisateur | null>;
     save(utilisateur: Utilisateur): Promise<Utilisateur>;
+    delete(id: string): Promise<void>;
 }
 
 export const UTILISATEUR_REPOSITORY = Symbol('UTILISATEUR_REPOSITORY');

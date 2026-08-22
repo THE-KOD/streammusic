@@ -33,4 +33,7 @@ export class TypeOrmUtilisateurRepository implements UtilisateurRepository {
         const saved = await this.repo.save(orm);
         return UtilisateurMapper.toDomain(saved);
     }
+    async delete(id: string): Promise<void> {
+        await this.repo.delete(id);
+    }
 }

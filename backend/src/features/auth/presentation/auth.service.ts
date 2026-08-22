@@ -11,6 +11,9 @@ import { TOKEN_GENERATOR } from '../domain/token-generator';
 import type { TokenGenerator } from '../domain/token-generator';
 import { InvalidCredentialsError, CompteSuspenduError, SessionInvalideError } from '../domain/errors';
 import type { AuthTokens } from '../domain/auth.types';
+// Nouveau : abonnement créé automatiquement à l'inscription.
+import { ABONNEMENT_REPOSITORY, Abonnement } from '../../subscriptions';
+import type { AbonnementRepository } from '../../subscriptions';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,7 @@ export class AuthService {
         @Inject(SESSION_REPOSITORY) private readonly sessionRepository: SessionRepository,
         @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
         @Inject(TOKEN_GENERATOR) private readonly tokenGenerator: TokenGenerator,
+        @Inject(ABONNEMENT_REPOSITORY) private readonly abonnementRepository: AbonnementRepository,
     ) {}
 
     async register(pseudo: string, email: string, motDePasse: string): Promise<{ tokens: AuthTokens; utilisateur: Utilisateur }> {
@@ -40,6 +44,27 @@ export class AuthService {
         });
 
         const saved = await this.utilisateurRepository.save(utilisateur);
+
+        // Création de l'abonnement GRATUIT par défaut — relation 1-1 stricte
+        // avec l'utilisateur (voir schéma SQL). Compensation manuelle en cas
+        // d'échec : voir l'explication en tête de réponse pour le "pourquoi".
+        try {
+            const abonnement = Abonnement.create({
+                id: randomUUID(),
+                utilisateurId: saved.id,
+                type: 'GRATUIT',
+                dateDebut: new Date().toISOString().slice(0, 10),
+                dateFin: null,
+            });
+            await this.abonnementRepository.save(abonnement);
+        } catch (err) {
+            // Rien ne doit rester en base si l'abonnement n'a pas pu être créé —
+            // on annule la création de l'utilisateur plutôt que de laisser un
+            // compte "orphelin" sans abonnement.
+            await this.utilisateurRepository.delete(saved.id);
+            throw err;
+        }
+
         const tokens = await this.issueSession(saved.id);
         return { tokens, utilisateur: saved };
     }
@@ -64,7 +89,6 @@ export class AuthService {
         const session = await this.sessionRepository.findByRefreshTokenHash(hash);
         if (!session || !session.estValide) throw new SessionInvalideError();
 
-        // Rotation : l'ancien refresh token est immédiatement invalidé
         session.revoquer();
         await this.sessionRepository.save(session);
 
