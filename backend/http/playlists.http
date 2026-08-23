@@ -1,0 +1,56 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Mes playlists
+GET {{baseUrl}}/playlists/mine
+Authorization: Bearer {{accessToken}}
+
+### 2. Créer une playlist
+POST {{baseUrl}}/playlists
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nom": "Ma playlist du matin"
+}
+
+### 3. Consulter une playlist
+GET {{baseUrl}}/playlists/PLAYLIST_ID
+Authorization: Bearer {{accessToken}}
+
+### 4. Ajouter un titre
+POST {{baseUrl}}/playlists/PLAYLIST_ID/tracks/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 5. Lister les titres, dans l'ordre
+GET {{baseUrl}}/playlists/PLAYLIST_ID/tracks
+Authorization: Bearer {{accessToken}}
+
+### 6. Déplacer un titre en première position
+PATCH {{baseUrl}}/playlists/PLAYLIST_ID/tracks/TRACK_ID/position
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "versPosition": 0
+}
+
+### 7. Renommer et rendre publique
+PATCH {{baseUrl}}/playlists/PLAYLIST_ID
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "nom": "Nouveau nom",
+  "visibilite": "PUBLIQUE"
+}
+
+### 8. Retirer un titre
+DELETE {{baseUrl}}/playlists/PLAYLIST_ID/tracks/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 9. Supprimer la playlist
+DELETE {{baseUrl}}/playlists/PLAYLIST_ID
+Authorization: Bearer {{accessToken}}
