@@ -1,0 +1,27 @@
+### Variables
+@baseUrl = http://localhost:3000
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Mes titres likés
+GET {{baseUrl}}/favorites/tracks
+Authorization: Bearer {{accessToken}}
+
+### 2. Ajouter un titre en favori
+POST {{baseUrl}}/favorites/tracks/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 3. Retirer un titre des favoris
+DELETE {{baseUrl}}/favorites/tracks/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 4. Mes albums sauvegardés
+GET {{baseUrl}}/favorites/albums
+Authorization: Bearer {{accessToken}}
+
+### 5. Sauvegarder un album
+POST {{baseUrl}}/favorites/albums/ALBUM_ID
+Authorization: Bearer {{accessToken}}
+
+### 6. Retirer un album sauvegardé
+DELETE {{baseUrl}}/favorites/albums/ALBUM_ID
+Authorization: Bearer {{accessToken}}

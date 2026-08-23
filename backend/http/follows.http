@@ -1,0 +1,19 @@
+### Variables
+@baseUrl = http://localhost:3000
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Artistes que je suis
+GET {{baseUrl}}/follows
+Authorization: Bearer {{accessToken}}
+
+### 2. Statut de suivi pour un artiste
+GET {{baseUrl}}/follows/ARTIST_ID/status
+Authorization: Bearer {{accessToken}}
+
+### 3. Suivre un artiste
+POST {{baseUrl}}/follows/ARTIST_ID
+Authorization: Bearer {{accessToken}}
+
+### 4. Ne plus suivre un artiste
+DELETE {{baseUrl}}/follows/ARTIST_ID
+Authorization: Bearer {{accessToken}}
