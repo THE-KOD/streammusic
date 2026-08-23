@@ -1,0 +1,29 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Ma file d'attente
+GET {{baseUrl}}/queue
+Authorization: Bearer {{accessToken}}
+
+### 2. Ajouter un titre
+POST {{baseUrl}}/queue/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 3. Déplacer un titre en première position
+PATCH {{baseUrl}}/queue/TRACK_ID/position
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "versPosition": 0
+}
+
+### 4. Retirer un titre
+DELETE {{baseUrl}}/queue/TRACK_ID
+Authorization: Bearer {{accessToken}}
+
+### 5. Vider toute la file
+DELETE {{baseUrl}}/queue
+Authorization: Bearer {{accessToken}}

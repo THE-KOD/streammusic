@@ -6,7 +6,7 @@ import { PLAYLIST_TRACK_REPOSITORY } from '../domain/playlist-track.repository';
 import type { PlaylistTrackRepository } from '../domain/playlist-track.repository';
 import { Playlist, Visibilite } from '../domain/playlist.entity';
 import { PlaylistNotFoundError, TitreDejaDansPlaylistError, TitreAbsentDePlaylistError } from '../domain/errors';
-import { reorderTracks } from '../domain/reorder-tracks';
+import { reorderList } from '../../../shared/utils/reorder-list';
 import { TRACK_REPOSITORY, Track, TrackNotFoundError } from '../../catalog-tracks';
 import type { TrackRepository } from '../../catalog-tracks';
 import { ForbiddenError } from '../../../core/errors';
@@ -124,7 +124,12 @@ export class PlaylistsService {
         const present = entries.some((e) => e.titreId === titreId);
         if (!present) throw new TitreAbsentDePlaylistError();
 
-        const nouvelOrdre = reorderTracks(entries, titreId, versPosition); // fonction pure, voir domain/
+        // Conversion vers/depuis la forme générique { id, ordre } attendue par
+        // reorderList() — la fonction elle-même ignore tout du domaine playlists.
+        const genericEntries = entries.map((e) => ({ id: e.titreId, ordre: e.ordre }));
+        const reordered = reorderList(genericEntries, titreId, versPosition);
+        const nouvelOrdre = reordered.map((e) => ({ titreId: e.id, ordre: e.ordre }));
+
         await this.playlistTrackRepository.reorderAll(playlistId, nouvelOrdre);
     }
 }

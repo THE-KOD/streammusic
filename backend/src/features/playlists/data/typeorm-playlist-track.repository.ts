@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PlaylistTrackRepository } from '../domain/playlist-track.repository';
-import { PlaylistTrackEntry } from '../domain/reorder-tracks';
+import { PlaylistTrackEntry, PlaylistTrackRepository } from '../domain/playlist-track.repository';
 import { PlaylistTitreOrmEntity } from './orm/playlist-titre.orm-entity';
 
 @Injectable()

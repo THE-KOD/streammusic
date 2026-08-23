@@ -1,0 +1,22 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Enregistrer une écoute
+POST {{baseUrl}}/listening-history
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "titreId": "TRACK_ID",
+  "dureeEcoutee": 150
+}
+
+### 2. Mon historique
+GET {{baseUrl}}/listening-history/mine
+Authorization: Bearer {{accessToken}}
+
+### 3. Effacer mon historique
+DELETE {{baseUrl}}/listening-history/mine
+Authorization: Bearer {{accessToken}}
