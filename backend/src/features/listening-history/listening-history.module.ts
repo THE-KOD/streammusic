@@ -14,5 +14,6 @@ import { ListeningHistoryController } from './presentation/listening-history.con
         { provide: HISTORIQUE_REPOSITORY, useClass: TypeOrmHistoriqueRepository },
         ListeningHistoryService,
     ],
+    exports: [HISTORIQUE_REPOSITORY]
 })
 export class ListeningHistoryModule {}

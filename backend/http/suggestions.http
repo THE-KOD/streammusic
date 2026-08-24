@@ -1,0 +1,11 @@
+### Variables
+@baseUrl = http://localhost:3000
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Mes suggestions actuelles
+GET {{baseUrl}}/suggestions/mine
+Authorization: Bearer {{accessToken}}
+
+### 2. Régénérer mes suggestions
+POST {{baseUrl}}/suggestions/mine/generate
+Authorization: Bearer {{accessToken}}

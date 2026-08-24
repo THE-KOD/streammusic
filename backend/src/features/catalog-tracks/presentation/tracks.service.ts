@@ -11,6 +11,8 @@ import type { GenreRepository } from '../../catalog-genres';
 import { ALBUM_REPOSITORY, AlbumNotFoundError } from '../../catalog-albums';
 import type { AlbumRepository } from '../../catalog-albums';
 import { ForbiddenError } from '../../../core/errors';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TrackValidatedEvent, TRACK_VALIDATED_EVENT } from '../domain/events/track-validated.event';
 
 export interface CreateTrackInput {
     titre: string;
@@ -37,6 +39,7 @@ export class TracksService {
         @Inject(ARTISTE_REPOSITORY) private readonly artisteRepository: ArtisteRepository,
         @Inject(GENRE_REPOSITORY) private readonly genreRepository: GenreRepository,
         @Inject(ALBUM_REPOSITORY) private readonly albumRepository: AlbumRepository,
+        private readonly eventEmitter: EventEmitter2,
     ) {}
 
     async create(artisteId: string, input: CreateTrackInput): Promise<Track> {
@@ -125,6 +128,14 @@ export class TracksService {
         const track = await this.getById(id);
         if (statut === 'VALIDE') track.valider();
         else track.rejeter();
-        return this.trackRepository.save(track);
+        const saved = await this.trackRepository.save(track);
+
+        if (statut === 'VALIDE') {
+            // Fire-and-forget : l'émetteur n'attend pas la fin du traitement par
+            // les listeners (voir la note sur le timing dans le test e2e notifications).
+            this.eventEmitter.emit(TRACK_VALIDATED_EVENT, new TrackValidatedEvent(saved.id, saved.titre, saved.artisteId));
+        }
+
+        return saved;
     }
 }

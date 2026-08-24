@@ -1,0 +1,23 @@
+### Variables
+@baseUrl = http://localhost:3000
+@accessToken = COLLE_TON_ACCESS_TOKEN_ICI
+
+### 1. Mes notifications
+GET {{baseUrl}}/notifications/mine
+Authorization: Bearer {{accessToken}}
+
+### 2. Uniquement les non lues
+GET {{baseUrl}}/notifications/mine?unread=true
+Authorization: Bearer {{accessToken}}
+
+### 3. Compteur non lues
+GET {{baseUrl}}/notifications/mine/unread-count
+Authorization: Bearer {{accessToken}}
+
+### 4. Marquer une notification comme lue
+PATCH {{baseUrl}}/notifications/NOTIFICATION_ID/read
+Authorization: Bearer {{accessToken}}
+
+### 5. Tout marquer comme lu
+PATCH {{baseUrl}}/notifications/mine/read-all
+Authorization: Bearer {{accessToken}}

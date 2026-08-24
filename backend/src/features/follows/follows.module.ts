@@ -11,9 +11,7 @@ import { FollowsController } from './presentation/follows.controller';
 @Module({
     imports: [ArtistsModule, UsersModule, TypeOrmModule.forFeature([SuiviOrmEntity])],
     controllers: [FollowsController],
-    providers: [
-        { provide: FOLLOWS_REPOSITORY, useClass: TypeOrmFollowsRepository },
-        FollowsService,
-    ],
+    providers: [{ provide: FOLLOWS_REPOSITORY, useClass: TypeOrmFollowsRepository }, FollowsService],
+    exports: [FOLLOWS_REPOSITORY],
 })
 export class FollowsModule {}

@@ -33,4 +33,8 @@ export class TypeOrmFollowsRepository implements FollowsRepository {
         const rows = await this.repo.find({ where: { followerId }, order: { dateSuivi: 'DESC' } });
         return rows.map((r) => r.artisteId);
     }
+    async listFollowerIdsOf(artisteId: string): Promise<string[]> {
+        const rows = await this.repo.find({ where: { artisteId } });
+        return rows.map((r) => r.followerId);
+    }
 }

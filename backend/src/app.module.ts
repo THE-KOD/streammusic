@@ -22,6 +22,8 @@ import { SuggestionsModule } from './features/suggestions/suggestions.module';
 import { SubscriptionsModule } from './features/subscriptions/subscriptions.module';
 import { SearchModule } from './features/search/search.module';
 import { AdminModule } from './features/admin/admin.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { AdminModule } from './features/admin/admin.module';
       validationSchema: envValidationSchema,
     }),
     DatabaseModule,
+    EventEmitterModule.forRoot(), // nouveau — global par défaut, injectable partout sans réimport
     AuthModule,
     UsersModule,
     UsersModule,

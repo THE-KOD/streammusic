@@ -20,7 +20,7 @@ describe('TracksService', () => {
         artisteRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), save: jest.fn() };
         genreRepository = { findAll: jest.fn(), findById: jest.fn(), findByNom: jest.fn(), save: jest.fn(), delete: jest.fn() };
         albumRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), findByArtisteId: jest.fn(), save: jest.fn(), delete: jest.fn() };
-        service = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository);
+        service = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit: jest.fn() } as any);
     });
 
     it("refuse de créer un titre dans l'album d'un autre artiste", async () => {
