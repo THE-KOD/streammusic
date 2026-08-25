@@ -1,0 +1,11 @@
+### Variables
+@baseUrl = http://localhost:3000
+
+### 1. Recherche combinée simple
+GET {{baseUrl}}/search?q=midnight
+
+### 2. Recherche filtrée par genre et durée
+GET {{baseUrl}}/search?q=drive&genreId=GENRE_ID&dureeMin=100&dureeMax=300
+
+### 3. Sans terme de recherche — doit renvoyer 400
+GET {{baseUrl}}/search

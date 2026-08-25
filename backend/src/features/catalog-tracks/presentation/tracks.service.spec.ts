@@ -72,4 +72,48 @@ describe('TracksService', () => {
         const result = await service.moderer('t1', 'VALIDE');
         expect(result.statutModeration).toBe('VALIDE');
     });
+
+    it("émet TRACK_UNPUBLISHED_EVENT quand un titre est rejeté", async () => {
+        const track = Track.create({
+            id: 't1', albumId: null, artisteId: 'a1', genreId: 'g1', titre: 'T', duree: 200,
+            fichierAudioUrl: 'https://x.com/a.mp3', pochetteUrl: null, dateSortie: null,
+            nombreEcoutes: 0, dateAjout: new Date(), statutModeration: 'EN_ATTENTE', moderateurId: null, dateModeration: null,
+        });
+        trackRepository.findById.mockResolvedValue(track);
+        trackRepository.save.mockImplementation(async (t) => t);
+        const emit = jest.fn();
+        const svc = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit } as any);
+
+        await svc.moderer('t1', 'REJETE');
+        expect(emit).toHaveBeenCalledWith('track.unpublished', expect.objectContaining({ titreId: 't1' }));
+    });
+
+    it("émet TRACK_UNPUBLISHED_EVENT quand un titre validé est modifié (repasse EN_ATTENTE)", async () => {
+        const track = Track.create({
+            id: 't1', albumId: null, artisteId: 'a1', genreId: 'g1', titre: 'T', duree: 200,
+            fichierAudioUrl: 'https://x.com/a.mp3', pochetteUrl: null, dateSortie: null,
+            nombreEcoutes: 0, dateAjout: new Date(), statutModeration: 'VALIDE', moderateurId: null, dateModeration: new Date(),
+        });
+        trackRepository.findById.mockResolvedValue(track);
+        trackRepository.save.mockImplementation(async (t) => t);
+        const emit = jest.fn();
+        const svc = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit } as any);
+
+        await svc.update('t1', 'a1', { titre: 'Nouveau titre' });
+        expect(emit).toHaveBeenCalledWith('track.unpublished', expect.objectContaining({ titreId: 't1' }));
+    });
+
+    it('émet TRACK_UNPUBLISHED_EVENT à la suppression', async () => {
+        const track = Track.create({
+            id: 't1', albumId: null, artisteId: 'a1', genreId: 'g1', titre: 'T', duree: 200,
+            fichierAudioUrl: 'https://x.com/a.mp3', pochetteUrl: null, dateSortie: null,
+            nombreEcoutes: 0, dateAjout: new Date(), statutModeration: 'VALIDE', moderateurId: null, dateModeration: new Date(),
+        });
+        trackRepository.findById.mockResolvedValue(track);
+        const emit = jest.fn();
+        const svc = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit } as any);
+
+        await svc.remove('t1', 'a1');
+        expect(emit).toHaveBeenCalledWith('track.unpublished', expect.objectContaining({ titreId: 't1' }));
+    });
 });

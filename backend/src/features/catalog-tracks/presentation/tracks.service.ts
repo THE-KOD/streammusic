@@ -13,6 +13,7 @@ import type { AlbumRepository } from '../../catalog-albums';
 import { ForbiddenError } from '../../../core/errors';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TrackValidatedEvent, TRACK_VALIDATED_EVENT } from '../domain/events/track-validated.event';
+import { TrackUnpublishedEvent, TRACK_UNPUBLISHED_EVENT } from '../domain/events/track-unpublished.event';
 
 export interface CreateTrackInput {
     titre: string;
@@ -112,8 +113,15 @@ export class TracksService {
             }
         }
 
-        track.modifierMetadonnees(input); // gère aussi le retour à EN_ATTENTE si besoin
-        return this.trackRepository.save(track);
+        const etaitValide = track.statutModeration === 'VALIDE';
+        track.modifierMetadonnees(input); // repasse en EN_ATTENTE si etaitValide
+        const saved = await this.trackRepository.save(track);
+
+        if (etaitValide && saved.statutModeration === 'EN_ATTENTE') {
+            this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(saved.id));
+        }
+
+        return saved;
     }
 
     async remove(id: string, connecteId: string): Promise<void> {
@@ -122,6 +130,9 @@ export class TracksService {
             throw new ForbiddenError("Vous ne pouvez supprimer qu'un titre de votre propre catalogue.");
         }
         await this.trackRepository.delete(id);
+        // Émis même si le titre n'était pas VALIDE — le listener gère l'absence
+        // silencieusement (voir TrackIndexingListener.handleUnpublished).
+        this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(id));
     }
 
     async moderer(id: string, statut: 'VALIDE' | 'REJETE'): Promise<Track> {
@@ -131,9 +142,9 @@ export class TracksService {
         const saved = await this.trackRepository.save(track);
 
         if (statut === 'VALIDE') {
-            // Fire-and-forget : l'émetteur n'attend pas la fin du traitement par
-            // les listeners (voir la note sur le timing dans le test e2e notifications).
             this.eventEmitter.emit(TRACK_VALIDATED_EVENT, new TrackValidatedEvent(saved.id, saved.titre, saved.artisteId));
+        } else {
+            this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(saved.id));
         }
 
         return saved;

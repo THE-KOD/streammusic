@@ -6,3 +6,4 @@ export type { TrackRepository, TrackFilters } from './domain/track.repository';
 export { TRACK_REPOSITORY } from './domain/track.repository';
 export * from './domain/errors';
 export { TrackValidatedEvent, TRACK_VALIDATED_EVENT } from './domain/events/track-validated.event';
+export { TrackUnpublishedEvent, TRACK_UNPUBLISHED_EVENT } from './domain/events/track-unpublished.event';
