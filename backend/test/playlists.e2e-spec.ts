@@ -34,6 +34,8 @@ describe('Playlists (e2e)', () => {
             .send({ pseudo: pseudoOwner, email: emailOwner, motDePasse: 'motDePasseSecurise123' });
         tokenOwner = resOwner.body.accessToken;
         await request(app.getHttpServer()).post('/artists/me').set('Authorization', `Bearer ${tokenOwner}`).send({});
+        // Retrofit nécessaire depuis le module admin : POST /genres exige un administrateur.
+        await dataSource.query('INSERT INTO administrateur (id, niveau_acces) VALUES (?, ?)', [resOwner.body.utilisateur.id, 'STANDARD']);
 
         const resOther = await request(app.getHttpServer()).post('/auth/register')
             .send({ pseudo: pseudoOther, email: emailOther, motDePasse: 'motDePasseSecurise123' });

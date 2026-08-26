@@ -135,10 +135,10 @@ export class TracksService {
         this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(id));
     }
 
-    async moderer(id: string, statut: 'VALIDE' | 'REJETE'): Promise<Track> {
+    async moderer(id: string, statut: 'VALIDE' | 'REJETE', moderateurId: string): Promise<Track> {
         const track = await this.getById(id);
-        if (statut === 'VALIDE') track.valider();
-        else track.rejeter();
+        if (statut === 'VALIDE') track.valider(moderateurId);
+        else track.rejeter(moderateurId);
         const saved = await this.trackRepository.save(track);
 
         if (statut === 'VALIDE') {

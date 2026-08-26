@@ -99,15 +99,16 @@ export class Track {
         }
     }
 
-    valider(): void {
+    valider(moderateurId: string): void {
         this.statutModeration = 'VALIDE';
         this.dateModeration = new Date();
-        // moderateurId volontairement non renseigné — voir note en tête de réponse.
+        this.moderateurId = moderateurId;
     }
 
-    rejeter(): void {
+    rejeter(moderateurId: string): void {
         this.statutModeration = 'REJETE';
         this.dateModeration = new Date();
+        this.moderateurId = moderateurId;
     }
 
     incrementerEcoutes(): void {

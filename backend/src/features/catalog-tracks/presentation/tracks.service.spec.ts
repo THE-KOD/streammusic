@@ -69,7 +69,7 @@ describe('TracksService', () => {
         trackRepository.findById.mockResolvedValue(track);
         trackRepository.save.mockImplementation(async (t) => t);
 
-        const result = await service.moderer('t1', 'VALIDE');
+        const result = await service.moderer('t1', 'VALIDE', 'admin-1');
         expect(result.statutModeration).toBe('VALIDE');
     });
 
@@ -84,7 +84,7 @@ describe('TracksService', () => {
         const emit = jest.fn();
         const svc = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit } as any);
 
-        await svc.moderer('t1', 'REJETE');
+        await svc.moderer('t1', 'REJETE', 'admin-1');
         expect(emit).toHaveBeenCalledWith('track.unpublished', expect.objectContaining({ titreId: 't1' }));
     });
 

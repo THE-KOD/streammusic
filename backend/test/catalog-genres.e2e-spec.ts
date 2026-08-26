@@ -27,26 +27,59 @@ describe('Catalog Genres (e2e)', () => {
         dataSource = moduleFixture.get(DataSource);
         await app.init();
 
-        // Un genre nécessite un utilisateur connecté pour être créé/modifié/supprimé
+        // Création du compte de test
         const registerRes = await request(app.getHttpServer())
             .post('/auth/register')
-            .send({ pseudo: testPseudo, email: testEmail, motDePasse: 'motDePasseSecurise123' });
+            .send({
+                pseudo: testPseudo,
+                email: testEmail,
+                motDePasse: 'motDePasseSecurise123',
+            });
+
         accessToken = registerRes.body.accessToken;
+
+        // Promotion du même utilisateur en administrateur
+        const userId = registerRes.body.utilisateur.id;
+
+        await dataSource.query(
+            'INSERT INTO administrateur (id, niveau_acces) VALUES (?, ?)',
+            [userId, 'STANDARD'],
+        );
     });
 
     afterAll(async () => {
-        // Nettoyage dans l'ordre : le genre d'abord (au cas où le test de suppression aurait échoué)
-        await dataSource.query('DELETE FROM genre WHERE nom = ?', [genreNom]);
-        await dataSource.query('DELETE FROM utilisateur WHERE email = ?', [testEmail]);
+        // Nettoyage dans l'ordre : le genre d'abord
+        await dataSource.query(
+            'DELETE FROM genre WHERE nom = ?',
+            [genreNom],
+        );
+
+        // Suppression du rôle administrateur avant la suppression de l'utilisateur
+        await dataSource.query(
+            'DELETE FROM administrateur WHERE id = (SELECT id FROM utilisateur WHERE email = ?)',
+            [testEmail],
+        );
+
+        // Suppression du compte utilisateur
+        await dataSource.query(
+            'DELETE FROM utilisateur WHERE email = ?',
+            [testEmail],
+        );
+
         await app.close();
     });
 
     it('GET /genres — accessible sans authentification', async () => {
-        await request(app.getHttpServer()).get('/genres').expect(200);
+        await request(app.getHttpServer())
+            .get('/genres')
+            .expect(200);
     });
 
     it('POST /genres — refuse sans authentification', async () => {
-        await request(app.getHttpServer()).post('/genres').send({ nom: genreNom }).expect(401);
+        await request(app.getHttpServer())
+            .post('/genres')
+            .send({ nom: genreNom })
+            .expect(401);
     });
 
     it('POST /genres — crée un genre', async () => {
@@ -71,12 +104,16 @@ describe('Catalog Genres (e2e)', () => {
     });
 
     it('GET /genres/:id — consulte le genre créé', async () => {
-        const res = await request(app.getHttpServer()).get(`/genres/${genreId}`).expect(200);
+        const res = await request(app.getHttpServer())
+            .get(`/genres/${genreId}`)
+            .expect(200);
+
         expect(res.body.nom).toBe(genreNom);
     });
 
     it('PATCH /genres/:id — renomme le genre', async () => {
         const nouveauNom = `${genreNom}_v2`;
+
         const res = await request(app.getHttpServer())
             .patch(`/genres/${genreId}`)
             .set('Authorization', `Bearer ${accessToken}`)
@@ -94,6 +131,8 @@ describe('Catalog Genres (e2e)', () => {
     });
 
     it('GET /genres/:id — 404 après suppression', async () => {
-        await request(app.getHttpServer()).get(`/genres/${genreId}`).expect(404);
+        await request(app.getHttpServer())
+            .get(`/genres/${genreId}`)
+            .expect(404);
     });
 });

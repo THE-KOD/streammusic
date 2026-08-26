@@ -36,4 +36,12 @@ export class TypeOrmUtilisateurRepository implements UtilisateurRepository {
     async delete(id: string): Promise<void> {
         await this.repo.delete(id);
     }
+    async findAll(): Promise<Utilisateur[]> {
+        const all = await this.repo.find({ order: { dateInscription: 'DESC' } });
+        return all.map(UtilisateurMapper.toDomain);
+    }
+
+    async countAll(): Promise<number> {
+        return this.repo.count();
+    }
 }

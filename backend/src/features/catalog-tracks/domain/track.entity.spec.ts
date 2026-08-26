@@ -42,14 +42,16 @@ describe('Track', () => {
         expect(track.statutModeration).toBe('EN_ATTENTE');
     });
 
-    it('valider() et rejeter() mettent à jour statut et dateModeration', () => {
+    it('valider() et rejeter() mettent à jour statut, dateModeration et moderateurId', () => {
         const track = Track.create(buildProps());
-        track.valider();
+        track.valider('admin-1');
         expect(track.statutModeration).toBe('VALIDE');
         expect(track.dateModeration).not.toBeNull();
+        expect(track.moderateurId).toBe('admin-1');
 
-        track.rejeter();
+        track.rejeter('admin-2');
         expect(track.statutModeration).toBe('REJETE');
+        expect(track.moderateurId).toBe('admin-2');
     });
 
     it('incrementerEcoutes() augmente le compteur de 1', () => {

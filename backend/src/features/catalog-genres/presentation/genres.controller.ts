@@ -5,6 +5,7 @@ import { CreateGenreDto } from './dto/create-genre.dto';
 import { GenreResponseDto } from './dto/enre-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { Genre } from '../domain/genre.entity';
+import { AdminGuard } from '../../admin';
 
 // Petite fonction de conversion, réutilisée par toutes les routes du controller —
 // évite de répéter { id: genre.id, nom: genre.nom } partout.
@@ -40,7 +41,7 @@ export class GenresController {
     // sur la restriction "admin uniquement" encore absente) ---
 
     @Post()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, AdminGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Créer un genre' })
     @ApiResponse({ status: 201, type: GenreResponseDto })
@@ -50,7 +51,7 @@ export class GenresController {
     }
 
     @Patch(':id')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, AdminGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Renommer un genre' })
     @ApiResponse({ status: 200, type: GenreResponseDto })
@@ -59,7 +60,7 @@ export class GenresController {
     }
 
     @Delete(':id')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, AdminGuard)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Supprimer un genre (refusé si utilisé par un titre)' })

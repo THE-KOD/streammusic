@@ -8,6 +8,7 @@ import { TrackResponseDto } from './dto/track-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { Track } from '../domain/track.entity';
+import {AdminGuard} from "../../admin";
 
 function toResponseDto(track: Track): TrackResponseDto {
     return {
@@ -95,11 +96,12 @@ export class TracksController {
     }
 
     @Patch(':id/moderer')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, AdminGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Valider ou rejeter un titre (ouvert à tout compte connecté pour l\'instant — voir note module admin)' })
+    @ApiOperation({ summary: 'Valider ou rejeter un titre (administrateurs uniquement)' })
     @ApiResponse({ status: 200, type: TrackResponseDto })
-    async moderer(@Param('id') id: string, @Body() dto: ModerateTrackDto): Promise<TrackResponseDto> {
-        return toResponseDto(await this.tracksService.moderer(id, dto.statut));
+    @ApiResponse({ status: 403, description: 'Réservé aux administrateurs' })
+    async moderer(@Param('id') id: string, @CurrentUser() userId: string, @Body() dto: ModerateTrackDto): Promise<TrackResponseDto> {
+        return toResponseDto(await this.tracksService.moderer(id, dto.statut, userId));
     }
 }

@@ -5,9 +5,10 @@ import { TypeOrmGenreRepository } from './data/typeorm-genre.repository';
 import { GENRE_REPOSITORY } from './domain/genre.repository';
 import { GenresService } from './presentation/genres.service';
 import { GenresController } from './presentation/genres.controller';
+import {AdminAccessModule} from "../admin/admin-access.module";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([GenreOrmEntity])],
+    imports: [TypeOrmModule.forFeature([GenreOrmEntity]), AdminAccessModule],
     controllers: [GenresController],
     providers: [
         { provide: GENRE_REPOSITORY, useClass: TypeOrmGenreRepository },

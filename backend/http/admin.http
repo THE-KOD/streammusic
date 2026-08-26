@@ -1,0 +1,23 @@
+### Variables
+@baseUrl = http://localhost:3000
+@accessToken = COLLE_UN_TOKEN_ADMIN_ICI
+
+### 1. Statistiques globales
+GET {{baseUrl}}/admin/stats
+Authorization: Bearer {{accessToken}}
+
+### 2. Lister les utilisateurs
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{accessToken}}
+
+### 3. Suspendre un compte
+PATCH {{baseUrl}}/admin/users/USER_ID/suspend
+Authorization: Bearer {{accessToken}}
+
+### 4. Réactiver un compte
+PATCH {{baseUrl}}/admin/users/USER_ID/reactivate
+Authorization: Bearer {{accessToken}}
+
+### 5. Supprimer un compte
+DELETE {{baseUrl}}/admin/users/USER_ID
+Authorization: Bearer {{accessToken}}
