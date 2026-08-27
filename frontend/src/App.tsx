@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router'
+import { ProtectedRoute } from './core/router/protected-route'
 import { ToastContainer } from './core/providers/toast-container'
 import { MainLayout } from './core/layout/main-layout'
 import { AdminLayout } from './features/admin/presentation/components/admin-layout'
@@ -40,22 +41,25 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Layout principal (avec header + player) */}
-          <Route element={<MainLayout />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/artists/:artistId" element={<ArtistProfilePage />} />
-            <Route path="/albums/:albumId" element={<AlbumDetailPage />} />
-            <Route path="/playlists" element={<MyPlaylistsPage />} />
-            <Route path="/playlists/:playlistId" element={<PlaylistDetailPage />} />
-            <Route path="/library" element={<LibraryPage />} />
-            <Route path="/queue" element={<QueuePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/settings/preferences" element={<PreferencesPage />} />
-            <Route path="/settings/password" element={<PasswordPage />} />
-            <Route path="/history" element={<ListeningHistoryPage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/premium" element={<PremiumPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/artists/:artistId" element={<ArtistProfilePage />} />
+              <Route path="/albums/:albumId" element={<AlbumDetailPage />} />
+              <Route path="/playlists" element={<MyPlaylistsPage />} />
+              <Route path="/playlists/:playlistId" element={<PlaylistDetailPage />} />
+              <Route path="/library" element={<LibraryPage />} />
+              <Route path="/queue" element={<QueuePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/preferences" element={<PreferencesPage />} />
+              <Route path="/settings/password" element={<PasswordPage />} />
+              <Route path="/history" element={<ListeningHistoryPage />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/premium" element={<PremiumPage />} />
+            </Route>
+
           </Route>
 
           {/* Layout Admin (sidebar spécifique, sans player) */}

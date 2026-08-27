@@ -6,15 +6,20 @@ import { Button } from '../../../../shared/components/button'
 import { useState } from 'react'
 import { Modal } from '../../../../shared/components/modal'
 import { useSubscription } from '../../../subscriptions'
+import { useAuthStore } from '../../../../core/store/auth-store'
+
 import { User, Settings, Lock, Shield, Star, LogOut } from 'lucide-react'
 
 export function SettingsPage() {
     const navigate = useNavigate()
+    const logout = useAuthStore((state) => state.logout)
     const { isPremium } = useSubscription()
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
-    const handleLogout = () => navigate('/login')
-
+    const handleLogout = async () => {
+        await logout()
+        navigate('/login')
+    }
     return (
         <div className="space-y-8">
             <PageHeader title="Paramètres" subtitle="Gérez votre compte et vos préférences" />

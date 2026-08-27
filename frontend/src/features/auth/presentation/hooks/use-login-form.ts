@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
-import { authService } from '../../data/auth-mock.service'
+import { authService } from '../../data/auth.service'
+import { useAuthStore } from '../../../../core/store/auth-store'
 import { useToastStore } from '../../../../core/store/toast-store'
 
 export function useLoginForm() {
     const navigate = useNavigate()
+    const setSession = useAuthStore((state) => state.setSession)
     const showToast = useToastStore((state) => state.showToast)
 
     const [email, setEmail] = useState('')
@@ -17,7 +19,8 @@ export function useLoginForm() {
         setError(null)
         setIsSubmitting(true)
         try {
-            await authService.login({ email, password })
+            const { tokens, user } = await authService.login({ email, password })
+            setSession(tokens.accessToken, tokens.refreshToken, user)
             showToast('Connexion réussie', 'success')
             navigate('/home')
         } catch (err) {

@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router'
 import { Avatar } from '../../shared/components/avatar'
 import { DropdownMenu } from '../../shared/components/dropdown-menu'
+import { useAuthStore } from '../store/auth-store'
+
 import clsx from 'clsx'
 
 const navItems = [
@@ -13,6 +15,7 @@ const navItems = [
 export function AppHeader() {
     const location = useLocation()
     const navigate = useNavigate()
+    const logout = useAuthStore((state) => state.logout)
 
     return (
         <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-surface/80 backdrop-blur-md border-b border-white/5">
@@ -57,7 +60,7 @@ export function AppHeader() {
                     { label: 'Passer Premium', onClick: () => navigate('/premium') },
                     { label: 'Uploader un titre', onClick: () => navigate('/upload') },
                     { label: 'Back-office admin', onClick: () => navigate('/admin') },
-                    { label: 'Déconnexion', onClick: () => navigate('/login'), variant: 'danger' },
+                    { label: 'Déconnexion', onClick: async () => { await logout(); navigate('/login') }, variant: 'danger' },
                 ]}
             />
         </header>

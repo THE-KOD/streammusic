@@ -22,4 +22,5 @@ export const envValidationSchema = Joi.object({
 
     GOOGLE_OAUTH_CLIENT_ID: Joi.string().allow('').optional(),
     GOOGLE_OAUTH_CLIENT_SECRET: Joi.string().allow('').optional(),
+    FRONTEND_URL: Joi.string().uri().default('http://localhost:5173'),
 });
