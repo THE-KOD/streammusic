@@ -48,6 +48,7 @@ export class TrackIndexingListener {
             duree: track.duree,
             dateSortie: track.dateSortie,
             pochetteUrl: track.pochetteUrl,
+            fichierAudioUrl: track.fichierAudioUrl, // nouveau
         });
     }
 

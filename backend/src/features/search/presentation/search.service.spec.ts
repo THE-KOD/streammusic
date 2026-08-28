@@ -29,14 +29,14 @@ describe('SearchService', () => {
         service = new SearchService(trackSearchRepository, artisteRepository, utilisateurRepository, albumRepository);
     });
 
-    it('filtre les artistes par sous-chaîne insensible à la casse', async () => {
-        artisteRepository.findAll.mockResolvedValue([Artiste.create({ id: 'a1', biographie: null, photoArtisteUrl: null })]);
+    it('filtre les artistes par sous-chaîne insensible à la casse, avec sa photo', async () => {
+        artisteRepository.findAll.mockResolvedValue([Artiste.create({ id: 'a1', biographie: null, photoArtisteUrl: 'https://x.com/a1.jpg' })]);
         utilisateurRepository.findById.mockResolvedValue(buildUtilisateur('a1', 'Nova Kline'));
         trackSearchRepository.search.mockResolvedValue([]);
         albumRepository.findAll.mockResolvedValue([]);
 
         const result = await service.search('nova', {});
-        expect(result.artists).toEqual([{ id: 'a1', pseudo: 'Nova Kline' }]);
+        expect(result.artists).toEqual([{ id: 'a1', pseudo: 'Nova Kline', photoArtisteUrl: 'https://x.com/a1.jpg' }]);
     });
 
     it('filtre les albums par sous-chaîne dans le titre', async () => {

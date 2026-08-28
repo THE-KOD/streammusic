@@ -2,7 +2,7 @@ export interface TrackSearchDocument {
     id: string;
     titre: string;
     artisteId: string;
-    artisteNom: string; // dénormalisé volontairement — MeiliSearch n'a pas de JOIN
+    artisteNom: string;
     albumId: string | null;
     albumTitre: string | null;
     genreId: string;
@@ -10,6 +10,7 @@ export interface TrackSearchDocument {
     duree: number;
     dateSortie: string | null;
     pochetteUrl: string | null;
+    fichierAudioUrl: string; // nouveau
 }
 
 export interface TrackSearchFilters {

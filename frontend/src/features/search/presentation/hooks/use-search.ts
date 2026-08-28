@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { searchService } from '../../data/search-mock.service'
-import type { SearchFilters, SearchResults } from '../../domain/search.entity'
+import { searchService } from '../../data/search.service'
+import type { SearchFilters, SearchResults } from '../../domain/search.types'
 
 export function useSearch() {
     const [query, setQuery] = useState('')
@@ -10,19 +10,24 @@ export function useSearch() {
     const [error, setError] = useState<string | null>(null)
 
     const search = async () => {
-        if (!query.trim()) { setResults(null); return }
+        if (!query.trim()) return
         setIsSearching(true)
         setError(null)
         try {
-            setResults(await searchService.search(query, filters))
-        } catch {
-            setError('La recherche a échoué. Réessaie.')
+            setResults(await searchService.search(query.trim(), filters))
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'La recherche a échoué.')
         } finally {
             setIsSearching(false)
         }
     }
 
-    const reset = () => { setQuery(''); setFilters({}); setResults(null); setError(null) }
+    const reset = () => {
+        setFilters({})
+        setQuery('')
+        setResults(null)
+        setError(null)
+    }
 
     return { query, setQuery, filters, setFilters, results, isSearching, error, search, reset }
 }
