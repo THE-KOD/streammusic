@@ -129,7 +129,9 @@ it('POST /suggestions/mine/generate — suggère le candidat du même genre, pas
         .set('Authorization', `Bearer ${token}`)
         .expect(201);
 
-    const ids = res.body.map((s: any) => s.titreId);
+    // TrackResponseDto expose maintenant l'identifiant sous "id"
+    // et non plus sous "titreId".
+    const ids = res.body.map((s: any) => s.id);
 
     expect(ids).toContain(candidateTrackId);
     expect(ids).not.toContain(listenedTrackId);
@@ -142,7 +144,7 @@ it('GET /suggestions/mine — reflète la dernière génération persistée', as
         .expect(200);
 
     expect(
-        res.body.some((s: any) => s.titreId === candidateTrackId),
+        res.body.some((s: any) => s.id === candidateTrackId),
     ).toBe(true);
 });
 });

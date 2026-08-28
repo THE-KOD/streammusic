@@ -1,46 +1,31 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TracksService } from './tracks.service';
+import { TrackEnrichmentService } from './track-enrichment.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ModerateTrackDto } from './dto/moderate-track.dto';
 import { TrackResponseDto } from './dto/track-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
-import { Track } from '../domain/track.entity';
-import {AdminGuard} from "../../admin";
-
-function toResponseDto(track: Track): TrackResponseDto {
-    return {
-        id: track.id,
-        albumId: track.albumId,
-        artisteId: track.artisteId,
-        genreId: track.genreId,
-        titre: track.titre,
-        duree: track.duree,
-        fichierAudioUrl: track.fichierAudioUrl,
-        pochetteUrl: track.pochetteUrl,
-        dateSortie: track.dateSortie,
-        nombreEcoutes: track.nombreEcoutes,
-        dateAjout: track.dateAjout,
-        statutModeration: track.statutModeration,
-    };
-}
+import { AdminGuard } from '../../admin';
 
 @ApiTags('catalog-tracks')
 @Controller('tracks')
 export class TracksController {
-    constructor(private readonly tracksService: TracksService) {}
+    constructor(
+        private readonly tracksService: TracksService,
+        private readonly trackEnrichmentService: TrackEnrichmentService,
+    ) {}
 
-    // IMPORTANT : cette route doit être déclarée AVANT `:id` ci-dessous,
-    // sinon NestJS interpréterait "mine" comme une valeur de :id.
     @Get('mine')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: "Lister mes propres titres, tous statuts confondus" })
+    @ApiOperation({ summary: 'Lister mes propres titres, tous statuts confondus' })
     @ApiResponse({ status: 200, type: [TrackResponseDto] })
     async listMine(@CurrentUser() userId: string): Promise<TrackResponseDto[]> {
-        return (await this.tracksService.listMine(userId)).map(toResponseDto);
+        const tracks = await this.tracksService.listMine(userId);
+        return this.trackEnrichmentService.enrichMany(tracks);
     }
 
     @Get()
@@ -55,7 +40,7 @@ export class TracksController {
         @Query('genreId') genreId?: string,
     ): Promise<TrackResponseDto[]> {
         const tracks = await this.tracksService.listPublic({ artisteId, albumId, genreId });
-        return tracks.map(toResponseDto);
+        return this.trackEnrichmentService.enrichMany(tracks);
     }
 
     @Get(':id')
@@ -63,7 +48,8 @@ export class TracksController {
     @ApiResponse({ status: 200, type: TrackResponseDto })
     @ApiResponse({ status: 404, description: 'Titre introuvable' })
     async getById(@Param('id') id: string): Promise<TrackResponseDto> {
-        return toResponseDto(await this.tracksService.getById(id));
+        const track = await this.tracksService.getById(id);
+        return this.trackEnrichmentService.enrichOne(track);
     }
 
     @Post()
@@ -72,7 +58,8 @@ export class TracksController {
     @ApiOperation({ summary: 'Uploader un titre (statut initial : EN_ATTENTE)' })
     @ApiResponse({ status: 201, type: TrackResponseDto })
     async create(@CurrentUser() userId: string, @Body() dto: CreateTrackDto): Promise<TrackResponseDto> {
-        return toResponseDto(await this.tracksService.create(userId, dto));
+        const track = await this.tracksService.create(userId, dto);
+        return this.trackEnrichmentService.enrichOne(track);
     }
 
     @Patch(':id')
@@ -80,9 +67,10 @@ export class TracksController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Modifier les métadonnées de son propre titre' })
     @ApiResponse({ status: 200, type: TrackResponseDto })
-    @ApiResponse({ status: 403, description: "Titre appartenant à un autre artiste" })
+    @ApiResponse({ status: 403, description: 'Titre appartenant à un autre artiste' })
     async update(@Param('id') id: string, @CurrentUser() userId: string, @Body() dto: UpdateTrackDto): Promise<TrackResponseDto> {
-        return toResponseDto(await this.tracksService.update(id, userId, dto));
+        const track = await this.tracksService.update(id, userId, dto);
+        return this.trackEnrichmentService.enrichOne(track);
     }
 
     @Delete(':id')
@@ -102,6 +90,7 @@ export class TracksController {
     @ApiResponse({ status: 200, type: TrackResponseDto })
     @ApiResponse({ status: 403, description: 'Réservé aux administrateurs' })
     async moderer(@Param('id') id: string, @CurrentUser() userId: string, @Body() dto: ModerateTrackDto): Promise<TrackResponseDto> {
-        return toResponseDto(await this.tracksService.moderer(id, dto.statut, userId));
+        const track = await this.tracksService.moderer(id, dto.statut, userId);
+        return this.trackEnrichmentService.enrichOne(track);
     }
 }

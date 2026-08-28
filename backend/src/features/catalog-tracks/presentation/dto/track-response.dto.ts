@@ -1,9 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TrackResponseDto {
     @ApiProperty() id: string;
     @ApiProperty({ nullable: true }) albumId: string | null;
     @ApiProperty() artisteId: string;
+    @ApiPropertyOptional() artisteNom?: string;
+    @ApiPropertyOptional() albumTitre?: string;
     @ApiProperty() genreId: string;
     @ApiProperty() titre: string;
     @ApiProperty() duree: number;

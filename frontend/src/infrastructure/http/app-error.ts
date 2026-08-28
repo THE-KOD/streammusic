@@ -1,12 +1,12 @@
 // Miroir du format d'erreur renvoyé par GlobalExceptionFilter côté backend :
 // { error: { code, message }, timestamp, path }
 export class AppError extends Error {
-    constructor(
-        public readonly code: string,
-        message: string,
-        public readonly status?: number,
-    ) {
+    public readonly code: string
+    public readonly status?: number
+
+    constructor(code: string, message: string, status?: number) {
         super(message)
-        this.name = 'AppError'
+        this.code = code
+        this.status = status
     }
 }

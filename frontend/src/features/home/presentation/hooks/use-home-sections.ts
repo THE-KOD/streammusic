@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { homeService } from '../../data/home-mock.service'
+import { homeService } from '../../data/home.service.ts'
 import type { Track } from '../../../../shared/types/track'
 
 interface SectionState {

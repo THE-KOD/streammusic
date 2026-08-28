@@ -1,10 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TrackResponseDto } from '../../../catalog-tracks/presentation/dto/track-response.dto';
 
-export class SuggestionResponseDto {
-    @ApiProperty() titreId: string;
-    @ApiProperty() titre: string;
-    @ApiProperty() artisteId: string;
-    @ApiProperty() duree: number;
-    @ApiProperty({ nullable: true }) pochetteUrl: string | null;
+export class SuggestionResponseDto extends TrackResponseDto {
     @ApiProperty() score: number;
 }
