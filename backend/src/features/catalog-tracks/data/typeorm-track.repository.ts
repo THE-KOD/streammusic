@@ -49,4 +49,10 @@ export class TypeOrmTrackRepository implements TrackRepository {
         // si ça change plus tard dans la Phase 3.
         await this.repo.delete(id);
     }
+
+    async countByArtiste(artisteId: string): Promise<number> {
+        // Seuls les titres publiquement visibles comptent — cohérent avec
+        // ce qu'un visiteur de la fiche artiste peut réellement voir/écouter.
+        return this.repo.count({ where: { artisteId, statutModeration: 'VALIDE' } });
+    }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { artistProfileService } from '../../data/artist-profile-mock.service'
+import { artistProfileService } from '../../data/artist-profile.service'
 import type { ArtistProfile } from '../../domain/artist-profile.entity'
 import type { Track } from '../../../../shared/types/track'
 import type { Album } from '../../../../shared/types/album'

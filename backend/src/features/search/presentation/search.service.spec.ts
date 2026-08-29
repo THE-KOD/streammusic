@@ -24,7 +24,7 @@ describe('SearchService', () => {
     beforeEach(() => {
         trackSearchRepository = { indexTrack: jest.fn(), removeTrack: jest.fn(), search: jest.fn() };
         artisteRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), save: jest.fn() };
-        utilisateurRepository = { findById: jest.fn(), findByEmail: jest.fn(), findByPseudo: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        utilisateurRepository = { findById: jest.fn(), findByEmail: jest.fn(), findByPseudo: jest.fn(), findAll: jest.fn(), countAll: jest.fn(), save: jest.fn(), delete: jest.fn() };
         albumRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), findByArtisteId: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new SearchService(trackSearchRepository, artisteRepository, utilisateurRepository, albumRepository);
     });

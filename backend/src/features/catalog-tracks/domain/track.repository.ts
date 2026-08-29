@@ -14,6 +14,7 @@ export interface TrackRepository {
     findAllByArtiste(artisteId: string): Promise<Track[]>;
     save(track: Track): Promise<Track>;
     delete(id: string): Promise<void>;
+    countByArtiste(artisteId: string): Promise<number>;
 }
 
 export const TRACK_REPOSITORY = Symbol('TRACK_REPOSITORY');

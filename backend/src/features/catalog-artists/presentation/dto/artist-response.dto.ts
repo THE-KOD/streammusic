@@ -1,8 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ArtistResponseDto {
     @ApiProperty() id: string;
-    @ApiProperty() pseudo: string; // vient de `users`, jamais stocké côté artiste
+    @ApiProperty() pseudo: string;
+    @ApiPropertyOptional() photoProfilUrl?: string;
     @ApiProperty({ nullable: true }) biographie: string | null;
     @ApiProperty({ nullable: true }) photoArtisteUrl: string | null;
+    @ApiPropertyOptional() followersCount?: number;
+    @ApiPropertyOptional() tracksCount?: number;
 }

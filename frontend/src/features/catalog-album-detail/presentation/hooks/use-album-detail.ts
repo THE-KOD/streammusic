@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { albumDetailService } from '../../data/album-detail-mock.service'
+import { albumDetailService } from '../../data/album-detail.service'
 import type { AlbumDetail, AlbumTrack } from '../../domain/album-detail.entity'
 
 interface AlbumDetailState {

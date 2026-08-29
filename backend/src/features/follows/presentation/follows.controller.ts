@@ -1,23 +1,40 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import {Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, Post, UseGuards} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FollowsService } from './follows.service';
 import { FollowStatusResponseDto } from './dto/follow-status-response.dto';
 import { FollowedArtistResponseDto } from './dto/followed-artist-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
+import { TRACK_REPOSITORY } from '../../catalog-tracks';
+import type { TrackRepository } from '../../catalog-tracks';
+import { ArtistStatsResponseDto } from './dto/artist-stats-response.dto';
 
 @ApiTags('follows')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('follows')
 export class FollowsController {
-    constructor(private readonly followsService: FollowsService) {}
+    constructor(
+        private readonly followsService: FollowsService,
+        @Inject(TRACK_REPOSITORY) private readonly trackRepository: TrackRepository,
+    ) {}
 
     @Get()
     @ApiOperation({ summary: 'Lister les artistes que je suis' })
     @ApiResponse({ status: 200, type: [FollowedArtistResponseDto] })
     async listFollowed(@CurrentUser() userId: string): Promise<FollowedArtistResponseDto[]> {
         return this.followsService.listFollowed(userId);
+    }
+
+    @Get(':artistId/stats')
+    @ApiOperation({ summary: "Statistiques publiques d'un artiste (followers, titres)" })
+    @ApiResponse({ status: 200, type: ArtistStatsResponseDto })
+    async getStats(@Param('artistId') artistId: string): Promise<ArtistStatsResponseDto> {
+        const [followerIds, tracksCount] = await Promise.all([
+            this.followsService['followsRepository'].listFollowerIdsOf(artistId),
+            this.trackRepository.countByArtiste(artistId),
+        ]);
+        return { followersCount: followerIds.length, tracksCount };
     }
 
     @Get(':artistId/status')

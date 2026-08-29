@@ -7,9 +7,10 @@ import { TypeOrmFollowsRepository } from './data/typeorm-follows.repository';
 import { FOLLOWS_REPOSITORY } from './domain/follows.repository';
 import { FollowsService } from './presentation/follows.service';
 import { FollowsController } from './presentation/follows.controller';
+import {TracksModule} from "../catalog-tracks/catalog-tracks.module";
 
 @Module({
-    imports: [ArtistsModule, UsersModule, TypeOrmModule.forFeature([SuiviOrmEntity])],
+    imports: [ArtistsModule, UsersModule, TracksModule, TypeOrmModule.forFeature([SuiviOrmEntity])],
     controllers: [FollowsController],
     providers: [{ provide: FOLLOWS_REPOSITORY, useClass: TypeOrmFollowsRepository }, FollowsService],
     exports: [FOLLOWS_REPOSITORY],

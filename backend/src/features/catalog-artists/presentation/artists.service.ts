@@ -11,6 +11,7 @@ import type { UtilisateurRepository } from '../../users';
 export interface ArtisteAvecPseudo {
     artiste: Artiste;
     pseudo: string;
+    photoProfilUrl?: string | null;
 }
 
 @Injectable()
@@ -49,12 +50,9 @@ export class ArtistsService {
         if (!artiste) throw new ArtisteNotFoundError(id);
 
         const utilisateur = await this.utilisateurRepository.findById(id);
-        // Ne devrait jamais arriver en pratique (ON DELETE CASCADE garantit que
-        // l'artiste disparaît si l'utilisateur disparaît) — mais on se protège
-        // quand même plutôt que de renvoyer un pseudo undefined au client.
         if (!utilisateur) throw new UtilisateurNotFoundError(id);
 
-        return { artiste, pseudo: utilisateur.pseudo };
+        return { artiste, pseudo: utilisateur.pseudo, photoProfilUrl: utilisateur.photoProfilUrl };
     }
 
     async list(): Promise<ArtisteAvecPseudo[]> {
