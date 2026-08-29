@@ -1,68 +1,44 @@
 import { apiClient } from '../../../infrastructure/http/api-client'
-import type { SearchFilters, SearchResults } from '../domain/search.types'
+import { mapTrackResponse, type BackendTrackDto } from '../../../shared/utils/map-track-response'
 import type { Track } from '../../../shared/types/track'
+import type { Artist } from '../../../shared/types/artist'
+import type { Album } from '../../../shared/types/album'
+import type { SearchFilters } from '../domain/search.entity'
 
-interface BackendSearchTrackDto {
-    id: string
-    titre: string
-    artisteId: string
-    artisteNom: string
-    albumId?: string | null
-    albumTitre?: string | null
-    duree: number
-    pochetteUrl: string | null
-    fichierAudioUrl: string
-}
-interface BackendSearchArtistDto {
+interface BackendArtistResult {
     id: string
     pseudo: string
-    photoArtisteUrl: string | null
+    photoProfilUrl?: string
 }
-interface BackendSearchAlbumDto {
+interface BackendAlbumResult {
     id: string
     titre: string
     artisteId: string
-    artisteNom: string
+    artisteNom?: string
     pochetteUrl: string | null
     dateSortie: string
 }
 interface BackendSearchResponse {
-    tracks: BackendSearchTrackDto[]
-    artists: BackendSearchArtistDto[]
-    albums: BackendSearchAlbumDto[]
+    tracks: BackendTrackDto[]
+    artists: BackendArtistResult[]
+    albums: BackendAlbumResult[]
 }
 
-// Mapper local, distinct de shared/utils/map-track-response.ts : la forme
-// renvoyée par /search est plus légère que TrackResponseDto (pas de
-// statutModeration/dateAjout, inutiles ici puisque seuls des titres validés
-// peuvent être indexés). Un seul site d'utilisation pour l'instant — pas
-// encore extrait vers shared/ (règle du "2e usage" du contrat).
-function mapSearchTrack(dto: BackendSearchTrackDto): Track {
-    return {
-        id: dto.id,
-        title: dto.titre,
-        artistName: dto.artisteNom,
-        artistId: dto.artisteId,
-        albumTitle: dto.albumTitre ?? undefined,
-        albumId: dto.albumId ?? undefined,
-        duration: dto.duree,
-        coverUrl: dto.pochetteUrl ?? undefined,
-        fileUrl: dto.fichierAudioUrl,
-    }
+export interface SearchResults {
+    tracks: Track[]
+    artists: Artist[]
+    albums: Album[]
 }
 
 export const searchService = {
     async search(query: string, filters: SearchFilters): Promise<SearchResults> {
         const { data } = await apiClient.get<BackendSearchResponse>('/search', {
-            params: { q: query, genreId: filters.genreId, dureeMin: filters.dureeMin, dureeMax: filters.dureeMax },
+            params: { q: query, genreId: filters.genreId, dureeMin: filters.minDuration, dureeMax: filters.maxDuration },
         })
         return {
-            tracks: data.tracks.map(mapSearchTrack),
-            artists: data.artists.map((a) => ({ id: a.id, name: a.pseudo, imageUrl: a.photoArtisteUrl ?? undefined })),
-            albums: data.albums.map((a) => ({
-                id: a.id, title: a.titre, artistName: a.artisteNom, artistId: a.artisteId,
-                releaseDate: a.dateSortie, coverUrl: a.pochetteUrl ?? undefined,
-            })),
+            tracks: data.tracks.map(mapTrackResponse),
+            artists: data.artists.map((a) => ({ id: a.id, name: a.pseudo, imageUrl: a.photoProfilUrl })),
+            albums: data.albums.map((a) => ({ id: a.id, title: a.titre, artistName: a.artisteNom, artistId: a.artisteId, releaseDate: a.dateSortie, coverUrl: a.pochetteUrl ?? undefined })),
         }
     },
 }

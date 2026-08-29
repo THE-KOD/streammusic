@@ -6,22 +6,31 @@ import { LoadingState, EmptyState, ErrorState } from '../../../../shared/compone
 import { useHomeSections } from '../hooks/use-home-sections'
 import { usePlayerStore, useCurrentTrack } from '../../../player/presentation/store/player-store'
 import type { Track } from '../../../../shared/types/track'
+import { dedupeById } from '../../../../shared/utils/dedupe-by-id'
 
-// ── TrackGrid (inchangé) ──
+
+// ── TrackGrid (remplace uniquement cette fonction) ──
 function TrackGrid({ tracks }: { tracks: Track[] }) {
     const playTrack = usePlayerStore((state) => state.playTrack)
     const currentTrack = useCurrentTrack()
     const isPlaying = usePlayerStore((state) => state.isPlaying)
+    const uniqueTracks = dedupeById(tracks)
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {tracks.map((track) => (
-                <TrackCard
-                    key={track.id}
-                    {...track}
-                    isPlaying={isPlaying && currentTrack?.id === track.id}
-                    onPlay={() => playTrack(track, tracks)}
-                />
+        <div
+            className="flex gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-1 px-1 snap-x snap-proximity
+                       [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent
+                       [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full
+                       hover:[&::-webkit-scrollbar-thumb]:bg-white/20"
+        >
+            {uniqueTracks.map((track) => (
+                <div key={track.id} className="w-40 sm:w-44 flex-shrink-0 snap-start">
+                    <TrackCard
+                        {...track}
+                        isPlaying={isPlaying && currentTrack?.id === track.id}
+                        onPlay={() => playTrack(track, uniqueTracks)}
+                    />
+                </div>
             ))}
         </div>
     )

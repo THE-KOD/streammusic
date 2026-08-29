@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { searchService } from '../../data/search.service'
-import type { SearchFilters, SearchResults } from '../../domain/search.types'
+import { searchService, type SearchResults } from '../../data/search.service'
+import type { SearchFilters } from '../../domain/search.entity'
 
 export function useSearch() {
     const [query, setQuery] = useState('')
@@ -14,9 +14,10 @@ export function useSearch() {
         setIsSearching(true)
         setError(null)
         try {
-            setResults(await searchService.search(query.trim(), filters))
+            const data = await searchService.search(query, filters)
+            setResults(data)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'La recherche a échoué.')
+            setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
         } finally {
             setIsSearching(false)
         }
@@ -24,7 +25,6 @@ export function useSearch() {
 
     const reset = () => {
         setFilters({})
-        setQuery('')
         setResults(null)
         setError(null)
     }

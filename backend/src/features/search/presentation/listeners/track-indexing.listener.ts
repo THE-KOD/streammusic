@@ -46,9 +46,9 @@ export class TrackIndexingListener {
             genreId: track.genreId,
             genreNom: genre?.nom ?? '',
             duree: track.duree,
+            fichierAudioUrl: track.fichierAudioUrl, // nouveau
             dateSortie: track.dateSortie,
             pochetteUrl: track.pochetteUrl,
-            fichierAudioUrl: track.fichierAudioUrl, // nouveau
         });
     }
 

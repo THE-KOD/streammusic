@@ -17,12 +17,9 @@ export class SearchController {
     async search(@Query() dto: SearchQueryDto): Promise<SearchResponseDto> {
         const result = await this.searchService.search(dto.q, { genreId: dto.genreId, dureeMin: dto.dureeMin, dureeMax: dto.dureeMax });
         return {
-            tracks: result.tracks.map((t) => ({
-                id: t.id, titre: t.titre, artisteId: t.artisteId, artisteNom: t.artisteNom,
-                albumId: t.albumId, albumTitre: t.albumTitre, duree: t.duree, pochetteUrl: t.pochetteUrl, fichierAudioUrl: t.fichierAudioUrl,
-            })),
+            tracks: result.tracks.map((t) => ({ id: t.id, titre: t.titre, artisteId: t.artisteId, artisteNom: t.artisteNom, duree: t.duree, fichierAudioUrl: t.fichierAudioUrl, pochetteUrl: t.pochetteUrl })),
             artists: result.artists,
-            albums: result.albums,
+            albums: result.albums.map(({ album, artisteNom }) => ({ id: album.id, titre: album.titre, artisteId: album.artisteId, artisteNom, pochetteUrl: album.pochetteUrl, dateSortie: album.dateSortie })),
         };
     }
 }

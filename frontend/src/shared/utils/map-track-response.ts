@@ -1,24 +1,19 @@
 import type { Track } from '../types/track'
 
-// Forme exacte renvoyée par le backend (TrackResponseDto) — les noms de
-// champs restent en français côté API. La traduction vers le vocabulaire
-// anglais déjà utilisé dans toute la couche presentation se fait ICI,
-// une seule fois — TrackRow/TrackCard n'ont jamais besoin de le savoir.
+// Ne modélise QUE les champs réellement lus par mapTrackResponse ci-dessous —
+// /tracks et /search renvoient des formes différentes, mais toutes deux
+// satisfont structurellement cette interface allégée.
 export interface BackendTrackDto {
     id: string
-    albumId: string | null
+    albumId?: string | null
     artisteId: string
     artisteNom?: string
     albumTitre?: string
-    genreId: string
     titre: string
     duree: number
     fichierAudioUrl: string
     pochetteUrl: string | null
-    dateSortie: string | null
-    nombreEcoutes: number
-    dateAjout: string
-    statutModeration: string
+    nombreEcoutes?: number
 }
 
 export function mapTrackResponse(dto: BackendTrackDto): Track {

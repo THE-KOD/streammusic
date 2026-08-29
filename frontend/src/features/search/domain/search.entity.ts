@@ -3,7 +3,7 @@ import type { Artist } from '../../../shared/types/artist'
 import type { Album } from '../../../shared/types/album'
 
 export interface SearchFilters {
-    genre?: string
+    genreId?: string
     minDuration?: number
     maxDuration?: number
 }

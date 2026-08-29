@@ -3,7 +3,7 @@ import { TRACK_SEARCH_REPOSITORY } from '../domain/track-search.repository';
 import type { TrackSearchRepository, TrackSearchFilters, TrackSearchDocument } from '../domain/track-search.repository';
 import { ARTISTE_REPOSITORY } from '../../catalog-artists';
 import type { ArtisteRepository } from '../../catalog-artists';
-import { ALBUM_REPOSITORY } from '../../catalog-albums';
+import { ALBUM_REPOSITORY, Album } from '../../catalog-albums';
 import type { AlbumRepository } from '../../catalog-albums';
 import { UTILISATEUR_REPOSITORY } from '../../users';
 import type { UtilisateurRepository } from '../../users';
@@ -11,16 +11,12 @@ import type { UtilisateurRepository } from '../../users';
 export interface ArtistSearchResult {
     id: string;
     pseudo: string;
-    photoArtisteUrl: string | null;
+    photoProfilUrl?: string;
 }
 
 export interface AlbumSearchResult {
-    id: string;
-    titre: string;
-    artisteId: string;
-    artisteNom: string;
-    pochetteUrl: string | null;
-    dateSortie: string;
+    album: Album;
+    artisteNom?: string;
 }
 
 export interface SearchResult {
@@ -54,7 +50,7 @@ export class SearchService {
         for (const artiste of all) {
             const utilisateur = await this.utilisateurRepository.findById(artiste.id);
             if (utilisateur && utilisateur.pseudo.toLowerCase().includes(lower)) {
-                result.push({ id: artiste.id, pseudo: utilisateur.pseudo, photoArtisteUrl: artiste.photoArtisteUrl });
+                result.push({ id: artiste.id, pseudo: utilisateur.pseudo, photoProfilUrl: utilisateur.photoProfilUrl ?? undefined });
             }
         }
         return result;
@@ -63,14 +59,11 @@ export class SearchService {
     private async searchAlbums(query: string): Promise<AlbumSearchResult[]> {
         const lower = query.toLowerCase();
         const all = await this.albumRepository.findAll();
-        const matched = all.filter((a) => a.titre.toLowerCase().includes(lower));
+        const matches = all.filter((a) => a.titre.toLowerCase().includes(lower));
         const result: AlbumSearchResult[] = [];
-        for (const album of matched) {
+        for (const album of matches) {
             const utilisateur = await this.utilisateurRepository.findById(album.artisteId);
-            result.push({
-                id: album.id, titre: album.titre, artisteId: album.artisteId,
-                artisteNom: utilisateur?.pseudo ?? 'Artiste inconnu', pochetteUrl: album.pochetteUrl, dateSortie: album.dateSortie,
-            });
+            result.push({ album, artisteNom: utilisateur?.pseudo });
         }
         return result;
     }

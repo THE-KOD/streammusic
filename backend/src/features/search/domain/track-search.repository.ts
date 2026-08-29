@@ -8,9 +8,9 @@ export interface TrackSearchDocument {
     genreId: string;
     genreNom: string;
     duree: number;
+    fichierAudioUrl: string; // nouveau — sans ça, aucun résultat de recherche n'est réellement jouable
     dateSortie: string | null;
     pochetteUrl: string | null;
-    fichierAudioUrl: string; // nouveau
 }
 
 export interface TrackSearchFilters {

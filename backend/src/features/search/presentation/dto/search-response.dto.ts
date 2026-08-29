@@ -5,24 +5,22 @@ export class SearchTrackResultDto {
     @ApiProperty() titre: string;
     @ApiProperty() artisteId: string;
     @ApiProperty() artisteNom: string;
-    @ApiPropertyOptional({ nullable: true }) albumId?: string | null;
-    @ApiPropertyOptional({ nullable: true }) albumTitre?: string | null;
     @ApiProperty() duree: number;
-    @ApiProperty({ nullable: true }) pochetteUrl: string | null;
     @ApiProperty() fichierAudioUrl: string;
+    @ApiProperty({ nullable: true }) pochetteUrl: string | null;
 }
 
 export class SearchArtistResultDto {
     @ApiProperty() id: string;
     @ApiProperty() pseudo: string;
-    @ApiProperty({ nullable: true }) photoArtisteUrl: string | null;
+    @ApiPropertyOptional() photoProfilUrl?: string;
 }
 
 export class SearchAlbumResultDto {
     @ApiProperty() id: string;
     @ApiProperty() titre: string;
     @ApiProperty() artisteId: string;
-    @ApiProperty() artisteNom: string;
+    @ApiPropertyOptional() artisteNom?: string;
     @ApiProperty({ nullable: true }) pochetteUrl: string | null;
     @ApiProperty() dateSortie: string;
 }
