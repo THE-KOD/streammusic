@@ -91,7 +91,7 @@ describe('Playlists (e2e)', () => {
     it('GET /playlists/:id/tracks — les titres sont dans l\'ordre d\'ajout', async () => {
         const res = await request(app.getHttpServer()).get(`/playlists/${playlistId}/tracks`)
             .set('Authorization', `Bearer ${tokenOwner}`).expect(200);
-        expect(res.body.map((t: any) => t.titreId)).toEqual([track1Id, track2Id]);
+        expect(res.body.map((t: any) => t.id)).toEqual([track1Id, track2Id]);
     });
 
     it('PATCH .../position — réordonne les titres', async () => {
@@ -100,7 +100,7 @@ describe('Playlists (e2e)', () => {
 
         const res = await request(app.getHttpServer()).get(`/playlists/${playlistId}/tracks`)
             .set('Authorization', `Bearer ${tokenOwner}`).expect(200);
-        expect(res.body.map((t: any) => t.titreId)).toEqual([track2Id, track1Id]);
+        expect(res.body.map((t: any) => t.id)).toEqual([track2Id, track1Id]);
     });
 
     it('PATCH /playlists/:id — renomme et rend publique', async () => {

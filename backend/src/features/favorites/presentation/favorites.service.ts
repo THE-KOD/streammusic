@@ -50,4 +50,11 @@ export class FavoritesService {
         const albums = await Promise.all(ids.map((id) => this.albumRepository.findById(id)));
         return albums.filter((a): a is Album => a !== null);
     }
+
+    isTrackLiked(utilisateurId: string, titreId: string): Promise<boolean> {
+        return this.favorisRepository.isTitreFavori(utilisateurId, titreId);
+    }
+    isAlbumSaved(utilisateurId: string, albumId: string): Promise<boolean> {
+        return this.favorisRepository.isAlbumFavori(utilisateurId, albumId);
+    }
 }

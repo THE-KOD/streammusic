@@ -10,6 +10,7 @@ import type { UtilisateurRepository } from '../../users';
 export interface FollowedArtiste {
     id: string;
     pseudo: string;
+    photoProfilUrl?: string;
 }
 
 @Injectable()
@@ -39,12 +40,10 @@ export class FollowsService {
 
     async listFollowed(followerId: string): Promise<FollowedArtiste[]> {
         const artisteIds = await this.followsRepository.listArtisteIdsFollowed(followerId);
-        // Même compromis "une requête par élément" qu'ailleurs dans le catalogue —
-        // acceptable tant que le nombre d'artistes suivis reste petit.
         const resultats: FollowedArtiste[] = [];
         for (const id of artisteIds) {
             const utilisateur = await this.utilisateurRepository.findById(id);
-            if (utilisateur) resultats.push({ id, pseudo: utilisateur.pseudo });
+            if (utilisateur) resultats.push({ id, pseudo: utilisateur.pseudo, photoProfilUrl: utilisateur.photoProfilUrl ?? undefined });
         }
         return resultats;
     }

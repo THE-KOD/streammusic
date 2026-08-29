@@ -1,13 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TrackResponseDto } from '../../../catalog-tracks/presentation/dto/track-response.dto';
 
-// DTO propre à ce module plutôt que de réutiliser celui de catalog-tracks —
-// même règle déjà appliquée dans favorites : jamais d'import depuis la
-// couche presentation d'une autre feature.
-export class PlaylistTrackResponseDto {
-    @ApiProperty() titreId: string;
-    @ApiProperty() titre: string;
-    @ApiProperty() artisteId: string;
-    @ApiProperty() duree: number;
-    @ApiProperty({ nullable: true }) pochetteUrl: string | null;
+// Réutilise TrackResponseDto en entier (fileUrl, artisteNom, albumTitre...)
+// plutôt qu'un DTO à moitié rempli — même pattern que SuggestionResponseDto.
+export class PlaylistTrackResponseDto extends TrackResponseDto {
     @ApiProperty() ordre: number;
 }

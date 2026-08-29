@@ -8,12 +8,13 @@ import { TypeOrmFavorisRepository } from './data/typeorm-favoris.repository';
 import { FAVORIS_REPOSITORY } from './domain/favoris.repository';
 import { FavoritesService } from './presentation/favorites.service';
 import { FavoritesController } from './presentation/favorites.controller';
+import {UsersModule} from "../users/users.module";
 
 @Module({
     // TracksModule et AlbumsModule importés pour vérifier l'existence d'un
     // titre/album avant de l'ajouter en favori, et pour résoudre les ids
     // favoris vers des objets complets lors de la lecture.
-    imports: [TracksModule, AlbumsModule, TypeOrmModule.forFeature([FavoriOrmEntity, AlbumFavoriOrmEntity])],
+    imports: [TracksModule, AlbumsModule, UsersModule, TypeOrmModule.forFeature([FavoriOrmEntity, AlbumFavoriOrmEntity])],
     controllers: [FavoritesController],
     providers: [
         { provide: FAVORIS_REPOSITORY, useClass: TypeOrmFavorisRepository },

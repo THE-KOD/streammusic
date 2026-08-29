@@ -8,31 +8,22 @@ import { PlaylistResponseDto } from './dto/playlist-response.dto';
 import { PlaylistTrackResponseDto } from './dto/playlist-track-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
-import { Track } from '../../catalog-tracks';
+import { TrackEnrichmentService } from '../../catalog-tracks/presentation/track-enrichment.service';
 
 function toResponseDto({ playlist, trackCount }: PlaylistWithCount): PlaylistResponseDto {
-    return {
-        id: playlist.id,
-        proprietaireId: playlist.proprietaireId,
-        nom: playlist.nom,
-        visibilite: playlist.visibilite,
-        dateCreation: playlist.dateCreation,
-        trackCount,
-    };
-}
-
-function toTrackDto(track: Track, ordre: number): PlaylistTrackResponseDto {
-    return { titreId: track.id, titre: track.titre, artisteId: track.artisteId, duree: track.duree, pochetteUrl: track.pochetteUrl, ordre };
+    return { id: playlist.id, proprietaireId: playlist.proprietaireId, nom: playlist.nom, visibilite: playlist.visibilite, dateCreation: playlist.dateCreation, trackCount };
 }
 
 @ApiTags('playlists')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard) // toutes les routes exigent une connexion — voir note d'accès en tête de réponse
+@UseGuards(JwtAuthGuard)
 @Controller('playlists')
 export class PlaylistsController {
-    constructor(private readonly playlistsService: PlaylistsService) {}
+    constructor(
+        private readonly playlistsService: PlaylistsService,
+        private readonly trackEnrichmentService: TrackEnrichmentService,
+    ) {}
 
-    // IMPORTANT : déclarée avant ':id', même précaution que /tracks/mine.
     @Get('mine')
     @ApiOperation({ summary: 'Lister mes propres playlists' })
     @ApiResponse({ status: 200, type: [PlaylistResponseDto] })
@@ -75,7 +66,8 @@ export class PlaylistsController {
     @ApiResponse({ status: 200, type: [PlaylistTrackResponseDto] })
     async listTracks(@Param('id') id: string, @CurrentUser() userId: string): Promise<PlaylistTrackResponseDto[]> {
         const entries = await this.playlistsService.listTracks(id, userId);
-        return entries.map(({ track, ordre }) => toTrackDto(track, ordre));
+        const dtos = await this.trackEnrichmentService.enrichMany(entries.map((e) => e.track));
+        return dtos.map((dto, i) => ({ ...dto, ordre: entries[i].ordre }));
     }
 
     @Post(':id/tracks/:trackId')
@@ -97,14 +89,9 @@ export class PlaylistsController {
 
     @Patch(':id/tracks/:trackId/position')
     @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: "Déplacer un titre à une nouvelle position" })
+    @ApiOperation({ summary: 'Déplacer un titre à une nouvelle position' })
     @ApiResponse({ status: 204 })
-    async reorderTrack(
-        @Param('id') id: string,
-        @Param('trackId') trackId: string,
-        @CurrentUser() userId: string,
-        @Body() dto: ReorderTrackDto,
-    ): Promise<void> {
+    async reorderTrack(@Param('id') id: string, @Param('trackId') trackId: string, @CurrentUser() userId: string, @Body() dto: ReorderTrackDto): Promise<void> {
         await this.playlistsService.reorderTrack(id, userId, trackId, dto.versPosition);
     }
 }

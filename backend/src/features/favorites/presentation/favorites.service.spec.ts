@@ -49,4 +49,14 @@ describe('FavoritesService', () => {
         expect(tracks).toHaveLength(1);
         expect(tracks[0].id).toBe('t1');
     });
+
+    it('isTrackLiked() délègue au repository', async () => {
+        favorisRepository.isTitreFavori.mockResolvedValue(true);
+        expect(await service.isTrackLiked('u1', 't1')).toBe(true);
+    });
+
+    it('isAlbumSaved() délègue au repository', async () => {
+        favorisRepository.isAlbumFavori.mockResolvedValue(false);
+        expect(await service.isAlbumSaved('u1', 'al1')).toBe(false);
+    });
 });
