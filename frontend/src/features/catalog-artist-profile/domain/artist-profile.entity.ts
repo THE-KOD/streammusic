@@ -3,4 +3,6 @@ export interface ArtistProfile {
     name: string
     imageUrl?: string
     bio?: string
+    followersCount?: number
+    tracksCount?: number
 }
