@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { favoritesService } from '../../data/favorites-mock.service'
+import { favoritesService } from '../../data/favorites.service'
 import type { Track } from '../../../../shared/types/track'
 
 export function useLikedTracks() {

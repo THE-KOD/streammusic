@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { playlistsService } from '../../data/playlists-mock.service'
+import { playlistsService } from '../../data/playlists.service'
 import type { Playlist, PlaylistTrack } from '../../domain/playlist.entity'
 
 export function usePlaylistDetail(playlistId: string) {
@@ -20,7 +20,17 @@ export function usePlaylistDetail(playlistId: string) {
 
     const addTrack = async (trackId: string) => { await playlistsService.addTrack(playlistId, trackId); reload() }
     const removeTrack = async (playlistTrackId: string) => { await playlistsService.removeTrack(playlistId, playlistTrackId); reload() }
-    const reorderTracks = async (from: number, to: number) => { await playlistsService.reorderTracks(playlistId, from, to); reload() }
+
+    // L'API attend (trackId, versPosition), pas deux index — traduction ici
+    // à partir de l'état déjà chargé, puisque le composant de glisser-déposer
+    // ne raisonne qu'en positions dans le tableau affiché.
+    const reorderTracks = async (from: number, to: number) => {
+        const moved = tracks[from]
+        if (!moved) return
+        await playlistsService.reorderTrack(playlistId, moved.track.id, to)
+        reload()
+    }
+
     const renamePlaylist = async (id: string, name: string) => { await playlistsService.rename(id, name); reload() }
     const updateVisibility = async (id: string, isPublic: boolean) => { await playlistsService.updateVisibility(id, isPublic); reload() }
     const deletePlaylist = async (id: string) => { await playlistsService.remove(id) }

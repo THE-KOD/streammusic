@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { followsService } from '../../data/follows-mock.service.ts'
+import { followsService } from '../../data/follows.service'
 import type { FollowedArtist } from '../../domain/follow.entity'
 
 export function useFollowedArtists() {

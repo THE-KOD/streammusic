@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { playlistsService } from '../../data/playlists-mock.service'
+import { playlistsService } from '../../data/playlists.service'
 import type { Playlist } from '../../domain/playlist.entity'
 
 export function usePlaylists() {

@@ -11,4 +11,8 @@ export const followsService = {
     async unfollow(artistId: string): Promise<void> {
         await apiClient.delete(`/follows/${artistId}`)
     },
+    async listFollowed(): Promise<{ id: string; name: string; imageUrl?: string }[]> {
+        const { data } = await apiClient.get<{ id: string; pseudo: string; photoProfilUrl?: string }[]>('/follows')
+        return data.map((a) => ({ id: a.id, name: a.pseudo, imageUrl: a.photoProfilUrl }))
+    },
 }

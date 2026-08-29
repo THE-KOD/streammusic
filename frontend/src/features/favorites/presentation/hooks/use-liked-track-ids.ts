@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { favoritesService } from '../../data/favorites-mock.service'
-
+import { favoritesService } from '../../data/favorites.service'
 export function useLikedTrackIds() {
     const [likedTrackIds, setLikedTrackIds] = useState<string[]>([])
 

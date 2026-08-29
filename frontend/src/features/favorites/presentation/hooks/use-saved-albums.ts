@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { favoritesService } from '../../data/favorites-mock.service'
+import { favoritesService } from '../../data/favorites.service'
 import type { Album } from '../../../../shared/types/album'
 
 export function useSavedAlbums() {

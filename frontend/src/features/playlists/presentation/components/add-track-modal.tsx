@@ -5,7 +5,7 @@ import { Input } from '../../../../shared/components/input'
 import { Button } from '../../../../shared/components/button'
 import { Card } from '../../../../shared/components/card'
 import { formatDuration } from '../../../../shared/utils/format-duration'
-import { CATALOG_TRACKS_MOCK } from '../../../../shared/mocks/catalog-tracks.mock'
+import { useTrackCatalog } from '../hooks/use-track-catalog'
 
 interface AddTrackModalProps {
     isOpen: boolean
@@ -19,15 +19,17 @@ export function AddTrackModal({ isOpen, onClose, onAdd, existingTrackIds }: AddT
     const [isLoading, setIsLoading] = useState(false)
     const [selectedId, setSelectedId] = useState<string | null>(null)
 
+    const { tracks: catalog, isLoading: isCatalogLoading } = useTrackCatalog()
+
     const filteredTracks = useMemo(() => {
         const q = query.toLowerCase().trim()
-        return CATALOG_TRACKS_MOCK
+        return catalog
             .filter((t) => !existingTrackIds.includes(t.id))
             .filter((t) =>
                 t.title.toLowerCase().includes(q) ||
                 t.artistName.toLowerCase().includes(q)
             )
-    }, [query, existingTrackIds])
+    }, [catalog, query, existingTrackIds])
 
     const handleAdd = async () => {
         if (!selectedId) return
@@ -53,7 +55,9 @@ export function AddTrackModal({ isOpen, onClose, onAdd, existingTrackIds }: AddT
                     autoFocus
                 />
                 <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
-                    {filteredTracks.length === 0 ? (
+                    {isCatalogLoading ? (
+                        <p className="text-sm text-muted text-center py-6">Chargement du catalogue...</p>
+                    ) : filteredTracks.length === 0 ? (
                         <p className="text-sm text-muted text-center py-6">
                             {query ? 'Aucun titre trouvé' : 'Aucun titre disponible à ajouter'}
                         </p>
