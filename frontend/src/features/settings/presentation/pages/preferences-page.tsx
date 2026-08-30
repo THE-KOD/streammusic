@@ -6,12 +6,14 @@ import { GenreSelector } from '../../../../shared/components/genre-selector'
 import { Button } from '../../../../shared/components/button'
 import { useUser } from '../../../profile'
 import { LoadingState } from '../../../../shared/components/states'
+import { useToastStore } from '../../../../core/store/toast-store'
 
 export function PreferencesPage() {
     const navigate = useNavigate()
     const { user, isLoading, updateGenres, allGenres } = useUser()
     const [selectedGenres, setSelectedGenres] = useState<string[]>([])
     const [isSaving, setIsSaving] = useState(false)
+    const showToast = useToastStore((state) => state.showToast)
 
     useEffect(() => {
         if (user) setSelectedGenres(user.genres)
@@ -21,6 +23,7 @@ export function PreferencesPage() {
         setIsSaving(true)
         try {
             await updateGenres(selectedGenres)
+            showToast('Préférences enregistrées', 'success')
             navigate('/settings')
         } finally {
             setIsSaving(false)

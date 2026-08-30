@@ -35,4 +35,8 @@ export const authService = {
         })
         return { tokens: { accessToken: data.accessToken, refreshToken: data.refreshToken }, user: data.utilisateur }
     },
+
+    async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+        await apiClient.patch('/auth/password', { currentPassword, newPassword })
+    },
 }

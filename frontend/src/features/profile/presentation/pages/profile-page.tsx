@@ -9,6 +9,7 @@ import { LoadingState, EmptyState } from '../../../../shared/components/states'
 import { useUser } from '../hooks/use-user'
 import { useSubscription } from '../../../subscriptions'
 import { Calendar, Mail, User as UserIcon, Crown } from 'lucide-react'
+import { useToastStore } from '../../../../core/store/toast-store'
 
 export function ProfilePage() {
     const navigate = useNavigate()
@@ -17,6 +18,7 @@ export function ProfilePage() {
     const [pseudo, setPseudo] = useState('')
     const [isSaving, setIsSaving] = useState(false)
     const [saveError, setSaveError] = useState<string | null>(null)
+    const showToast = useToastStore((state) => state.showToast)
 
     useEffect(() => {
         if (user) setPseudo(user.pseudo)
@@ -27,6 +29,7 @@ export function ProfilePage() {
         setIsSaving(true)
         try {
             await updateUser({ pseudo })
+            showToast('Profil mis à jour avec succès', 'success')
         } catch {
             setSaveError("Erreur lors de l'enregistrement")
         } finally {

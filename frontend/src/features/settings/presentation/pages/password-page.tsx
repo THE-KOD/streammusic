@@ -8,6 +8,8 @@ import { Card } from '../../../../shared/components/card'
 import { LoadingState } from '../../../../shared/components/states'
 import { Eye, EyeOff, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { useUser } from '../../../profile'
+import { authService } from '../../../auth/data/auth.service'
+import { useToastStore } from '../../../../core/store/toast-store'
 
 export function PasswordPage() {
     const navigate = useNavigate()
@@ -20,6 +22,7 @@ export function PasswordPage() {
     const [showConfirm, setShowConfirm] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const showToast = useToastStore((state) => state.showToast)
 
     if (isLoading) return <LoadingState />
     if (!user) return null
@@ -63,10 +66,11 @@ export function PasswordPage() {
         }
         setIsSubmitting(true)
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await authService.changePassword(currentPassword, newPassword)
+            showToast('Mot de passe modifié avec succès', 'success')
             navigate('/settings')
-        } catch {
-            setError('Erreur lors du changement de mot de passe.')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Erreur lors du changement de mot de passe.')
         } finally {
             setIsSubmitting(false)
         }
