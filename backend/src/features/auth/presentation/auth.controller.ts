@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -7,6 +7,7 @@ import { RefreshDto } from './dto/refresh.dto';
 import { AuthResponseDto, RefreshResponseDto } from './dto/auth-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -48,5 +49,17 @@ export class AuthController {
     @ApiOperation({ summary: 'Se déconnecter (révoque toutes les sessions actives)' })
     async logout(@CurrentUser() userId: string): Promise<void> {
         await this.authService.logout(userId);
+    }
+
+    @Patch('password')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Changer son mot de passe' })
+    @ApiResponse({ status: 204 })
+    @ApiResponse({ status: 401, description: 'Mot de passe actuel incorrect' })
+    @ApiResponse({ status: 403, description: 'Compte OAuth sans mot de passe' })
+    async changePassword(@CurrentUser() userId: string, @Body() dto: ChangePasswordDto): Promise<void> {
+        await this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
     }
 }

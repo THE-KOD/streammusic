@@ -9,11 +9,17 @@ import { PASSWORD_HASHER } from '../domain/password-hasher';
 import type { PasswordHasher } from '../domain/password-hasher';
 import { TOKEN_GENERATOR } from '../domain/token-generator';
 import type { TokenGenerator } from '../domain/token-generator';
-import { InvalidCredentialsError, CompteSuspenduError, SessionInvalideError } from '../domain/errors';
+import {
+    InvalidCredentialsError,
+    CompteSuspenduError,
+    SessionInvalideError,
+    CompteOAuthSansMotDePasseError, MotDePasseActuelIncorrectError
+} from '../domain/errors';
 import type { AuthTokens } from '../domain/auth.types';
 // Nouveau : abonnement créé automatiquement à l'inscription.
 import { ABONNEMENT_REPOSITORY, Abonnement } from '../../subscriptions';
 import type { AbonnementRepository } from '../../subscriptions';
+
 
 @Injectable()
 export class AuthService {
@@ -111,5 +117,16 @@ export class AuthService {
         });
         await this.sessionRepository.save(session);
         return tokens;
+    }
+
+    async changePassword(utilisateurId: string, currentPassword: string, newPassword: string): Promise<void> {
+        const utilisateur = await this.utilisateurRepository.findById(utilisateurId);
+        if (!utilisateur || !utilisateur.motDePasseHash) throw new CompteOAuthSansMotDePasseError();
+
+        const valide = await this.passwordHasher.compare(currentPassword, utilisateur.motDePasseHash);
+        if (!valide) throw new MotDePasseActuelIncorrectError();
+
+        utilisateur.motDePasseHash = await this.passwordHasher.hash(newPassword);
+        await this.utilisateurRepository.save(utilisateur);
     }
 }

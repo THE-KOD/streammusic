@@ -37,3 +37,16 @@ Authorization: Bearer {{accessToken}}
 {
   "pseudo": "un_pseudo_deja_pris_par_un_autre_compte"
 }
+
+### 6. Mes genres préférés
+GET {{baseUrl}}/users/me/preferences
+Authorization: Bearer {{accessToken}}
+
+### 7. Remplacer mes genres préférés
+PATCH {{baseUrl}}/users/me/preferences
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "genreIds": ["GENRE_ID_1", "GENRE_ID_2"]
+}

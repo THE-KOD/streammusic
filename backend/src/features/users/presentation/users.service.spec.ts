@@ -2,6 +2,8 @@ import { UsersService } from './users.service';
 import { Utilisateur } from '../domain/user.entity';
 import { PseudoDejaUtiliseError } from '../domain/errors';
 import type { UtilisateurRepository } from '../domain/user.repository';
+import type { GenreRepository } from '../../catalog-genres';
+import type { PreferencesRepository } from '../domain/preferences.repository';
 
 function buildUser(overrides: Partial<Parameters<typeof Utilisateur.create>[0]> = {}) {
     return Utilisateur.create({
@@ -21,6 +23,8 @@ function buildUser(overrides: Partial<Parameters<typeof Utilisateur.create>[0]> 
 describe('UsersService', () => {
     let repository: jest.Mocked<UtilisateurRepository>;
     let service: UsersService;
+    let genreRepository: jest.Mocked<GenreRepository>;
+    let preferencesRepository: jest.Mocked<PreferencesRepository>;
 
     beforeEach(() => {
         repository = {
@@ -28,8 +32,11 @@ describe('UsersService', () => {
             findByEmail: jest.fn(),
             findByPseudo: jest.fn(),
             save: jest.fn(),
+
         };
-        service = new UsersService(repository);
+        genreRepository = { findAll: jest.fn(), findById: jest.fn(), findByNom: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        preferencesRepository = { listGenreIds: jest.fn(), replaceGenres: jest.fn() };
+        service = new UsersService(repository, preferencesRepository, genreRepository);
     });
 
     it('refuse de changer de pseudo si déjà pris par un autre utilisateur', async () => {
@@ -50,5 +57,11 @@ describe('UsersService', () => {
 
         expect(repository.findByPseudo).not.toHaveBeenCalled();
         expect(updated.photoProfilUrl).toBe('https://x.com/a.jpg');
+    });
+
+    it('updateGenrePreferences() refuse un genre inexistant', async () => {
+        genreRepository.findById.mockResolvedValue(null);
+        await expect(service.updateGenrePreferences('u1', ['g-inconnu'])).rejects.toThrow();
+        expect(preferencesRepository.replaceGenres).not.toHaveBeenCalled();
     });
 });

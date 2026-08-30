@@ -59,6 +59,16 @@ Content-Type: {{contentType}}
   "refreshToken": "REFRESH_TOKEN_ICI"
 }
 
+### 8. Changer son mot de passe
+PATCH {{baseUrl}}/auth/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "motDePasseSecurise123",
+  "newPassword": "nouveauMotDePasse456"
+}
+
 ### 7. Déconnexion (nécessite un access token valide)
 # Remplace ACCESS_TOKEN_ICI par la valeur reçue à l'étape 4
 POST {{baseUrl}}/auth/logout

@@ -1,4 +1,5 @@
 import { UnauthorizedError } from '../../../core/errors';
+import { ForbiddenError } from '../../../core/errors';
 
 export class InvalidCredentialsError extends UnauthorizedError {
     constructor() {
@@ -15,5 +16,18 @@ export class SessionInvalideError extends UnauthorizedError {
 export class CompteSuspenduError extends UnauthorizedError {
     constructor() {
         super('Ce compte est suspendu.');
+    }
+}
+
+
+export class MotDePasseActuelIncorrectError extends UnauthorizedError {
+    constructor() {
+        super('Le mot de passe actuel est incorrect.');
+    }
+}
+
+export class CompteOAuthSansMotDePasseError extends ForbiddenError {
+    constructor() {
+        super('Ce compte utilise une connexion externe — aucun mot de passe à modifier.');
     }
 }

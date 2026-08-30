@@ -1,5 +1,5 @@
 import { AuthService } from './auth.service';
-import type { UtilisateurRepository } from '../../users';
+import {Utilisateur, UtilisateurRepository} from '../../users';
 import type { SessionRepository } from '../domain/session.repository';
 import type { PasswordHasher } from '../domain/password-hasher';
 import type { TokenGenerator } from '../domain/token-generator';
@@ -66,5 +66,30 @@ describe("AuthService — creation de l'abonnement a l'inscription", () => {
 
         expect(mocks.abonnementRepository.save).toHaveBeenCalled();
         expect(mocks.utilisateurRepository.delete).not.toHaveBeenCalled();
+    });
+
+    describe('AuthService — changePassword', () => {
+        it('refuse un mot de passe actuel incorrect', async () => {
+            const mocks = buildMocks();
+            mocks.utilisateurRepository.findById.mockResolvedValue(
+                Utilisateur.create({ id: 'u1', pseudo: 'jane', email: 'j@x.com', motDePasseHash: 'hash-existant', oauthProvider: null, oauthId: null, photoProfilUrl: null, statutCompte: 'ACTIF', dateInscription: new Date() }),
+            );
+            mocks.passwordHasher.compare.mockResolvedValue(false);
+            const service = new AuthService(mocks.utilisateurRepository, mocks.sessionRepository, mocks.passwordHasher, mocks.tokenGenerator, mocks.abonnementRepository);
+            await expect(service.changePassword('u1', 'mauvais', 'nouveauMotDePasse123')).rejects.toThrow();
+        });
+
+        it('change le mot de passe si le mot de passe actuel est correct', async () => {
+            const mocks = buildMocks();
+            mocks.utilisateurRepository.findById.mockResolvedValue(
+                Utilisateur.create({ id: 'u1', pseudo: 'jane', email: 'j@x.com', motDePasseHash: 'hash-existant', oauthProvider: null, oauthId: null, photoProfilUrl: null, statutCompte: 'ACTIF', dateInscription: new Date() }),
+            );
+            mocks.passwordHasher.compare.mockResolvedValue(true);
+            mocks.passwordHasher.hash.mockResolvedValue('nouveau-hash');
+            mocks.utilisateurRepository.save.mockImplementation(async (u) => u);
+            const service = new AuthService(mocks.utilisateurRepository, mocks.sessionRepository, mocks.passwordHasher, mocks.tokenGenerator, mocks.abonnementRepository);
+            await service.changePassword('u1', 'bon-mot-de-passe', 'nouveauMotDePasse123');
+            expect(mocks.utilisateurRepository.save).toHaveBeenCalledWith(expect.objectContaining({ motDePasseHash: 'nouveau-hash' }));
+        });
     });
 });
