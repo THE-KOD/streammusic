@@ -13,24 +13,20 @@ export class ListeningHistoryService {
         @Inject(TRACK_REPOSITORY) private readonly trackRepository: TrackRepository,
     ) {}
 
-    async logListen(utilisateurId: string, titreId: string, dureeEcoutee: number): Promise<HistoriqueEcoute> {
+    async logListen(utilisateurId: string, titreId: string, dureeEcoutee: number): Promise<{ entry: HistoriqueEcoute; track: Track }> {
         const track = await this.trackRepository.findById(titreId);
         if (!track) throw new TrackNotFoundError(titreId);
 
-        // create() (pas reconstruct()) : on est bien en train d'ÉCRIRE un nouvel
-        // enregistrement, la validation dureeEcoutee <= track.duree s'applique.
         const entry = HistoriqueEcoute.create(
             { id: randomUUID(), utilisateurId, titreId, dateEcoute: new Date(), dureeEcoutee },
             track.duree,
         );
-        const saved = await this.historiqueRepository.save(entry);
+        const savedEntry = await this.historiqueRepository.save(entry);
 
-        // Effet de bord assumé : logger une écoute incrémente le compteur public
-        // du titre — c'est ce compteur qui alimente le classement du dashboard admin.
         track.incrementerEcoutes();
-        await this.trackRepository.save(track);
+        const savedTrack = await this.trackRepository.save(track);
 
-        return saved;
+        return { entry: savedEntry, track: savedTrack };
     }
 
     async listMine(utilisateurId: string, limit = 50): Promise<{ entry: HistoriqueEcoute; track: Track }[]> {

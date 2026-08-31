@@ -5,33 +5,26 @@ import { CreateHistoryEntryDto } from './dto/create-history-entry.dto';
 import { HistoryEntryResponseDto } from './dto/history-entry-response.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
-import { HistoriqueEcoute } from '../domain/historique-ecoute.entity';
-import { Track } from '../../catalog-tracks';
-
-function toDto(entry: HistoriqueEcoute, track: Track): HistoryEntryResponseDto {
-    return {
-        id: entry.id, titreId: track.id, titre: track.titre, artisteId: track.artisteId,
-        pochetteUrl: track.pochetteUrl, dateEcoute: entry.dateEcoute, dureeEcoutee: entry.dureeEcoutee,
-    };
-}
+import { TrackEnrichmentService } from '../../catalog-tracks/presentation/track-enrichment.service';
 
 @ApiTags('listening-history')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('listening-history')
 export class ListeningHistoryController {
-    constructor(private readonly service: ListeningHistoryService) {}
+    constructor(
+        private readonly service: ListeningHistoryService,
+        private readonly trackEnrichmentService: TrackEnrichmentService,
+    ) {}
 
     @Post()
     @ApiOperation({ summary: 'Enregistrer une écoute (incrémente aussi le compteur du titre)' })
     @ApiResponse({ status: 201, type: HistoryEntryResponseDto })
     @ApiResponse({ status: 400, description: 'Durée écoutée supérieure à la durée du titre' })
     async logListen(@CurrentUser() userId: string, @Body() dto: CreateHistoryEntryDto): Promise<HistoryEntryResponseDto> {
-        const entry = await this.service.logListen(userId, dto.titreId, dto.dureeEcoutee);
-        // On sait que le titre existe (vérifié par le service) — on le re-cherche
-        // uniquement pour composer le DTO de réponse avec titre/artisteId.
-        const track = await this.service['trackRepository'].findById(dto.titreId);
-        return toDto(entry, track!);
+        const { entry, track } = await this.service.logListen(userId, dto.titreId, dto.dureeEcoutee);
+        const trackDto = await this.trackEnrichmentService.enrichOne(track);
+        return { id: entry.id, dateEcoute: entry.dateEcoute, dureeEcoutee: entry.dureeEcoutee, track: trackDto };
     }
 
     @Get('mine')
@@ -41,7 +34,8 @@ export class ListeningHistoryController {
     async listMine(@CurrentUser() userId: string, @Query('limit') limit?: string): Promise<HistoryEntryResponseDto[]> {
         const parsedLimit = limit ? parseInt(limit, 10) : undefined;
         const entries = await this.service.listMine(userId, parsedLimit);
-        return entries.map(({ entry, track }) => toDto(entry, track));
+        const tracks = await this.trackEnrichmentService.enrichMany(entries.map((e) => e.track));
+        return entries.map(({ entry }, i) => ({ id: entry.id, dateEcoute: entry.dateEcoute, dureeEcoutee: entry.dureeEcoutee, track: tracks[i] }));
     }
 
     @Delete('mine')

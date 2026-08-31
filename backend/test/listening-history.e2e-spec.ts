@@ -118,9 +118,7 @@ describe('Listening History (e2e)', () => {
             .set('Authorization', `Bearer ${token}`)
             .expect(200);
 
-        expect(
-            res.body.some((e: any) => e.titreId === trackId),
-        ).toBe(true);
+        expect(res.body.some((e: any) => e.track.id === trackId)).toBe(true);
     });
 
     it('DELETE /listening-history/mine — efface tout mon historique', async () => {

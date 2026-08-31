@@ -1,11 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TrackResponseDto } from '../../../catalog-tracks/presentation/dto/track-response.dto';
 
 export class HistoryEntryResponseDto {
     @ApiProperty() id: string;
-    @ApiProperty() titreId: string;
-    @ApiProperty() titre: string;
-    @ApiProperty() artisteId: string;
-    @ApiProperty({ nullable: true }) pochetteUrl: string | null;
     @ApiProperty() dateEcoute: Date;
     @ApiProperty() dureeEcoutee: number;
+    @ApiProperty({ type: TrackResponseDto }) track: TrackResponseDto;
 }
