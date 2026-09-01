@@ -128,7 +128,7 @@ const res = await request(app.getHttpServer())
 
 expect(res.body).toHaveLength(1);
 expect(res.body[0].type).toBe('NOUVELLE_SORTIE');
-expect(res.body[0].titreId).toBe(trackId);
+expect(res.body[0].track.id).toBe(trackId);
 });
 
 it('GET /notifications/mine/unread-count — 1 notification non lue', async () => {

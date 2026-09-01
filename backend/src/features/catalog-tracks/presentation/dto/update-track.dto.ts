@@ -1,9 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString, IsUrl, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsUuidString } from '../../../../core/validators/is-uuid-string.decorator';
 
-// Pas de "duree" ni "fichierAudioUrl" ici : changer le fichier audio d'un
-// titre déjà publié reviendrait à le remplacer entièrement — hors scope,
-// ce serait plutôt "supprimer puis re-uploader".
 export class UpdateTrackDto {
     @ApiPropertyOptional({ example: 'Midnight Drive (Remix)' })
     @IsOptional()
@@ -14,12 +12,12 @@ export class UpdateTrackDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsUUID()
+    @IsUuidString()
     genreId?: string;
 
     @ApiPropertyOptional({ nullable: true, description: 'null pour retirer le titre de son album (devient un single)' })
     @IsOptional()
-    @IsUUID()
+    @IsUuidString()
     albumId?: string | null;
 
     @ApiPropertyOptional({ nullable: true })

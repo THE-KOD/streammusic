@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsUUID, Min } from 'class-validator';
+import { IsInt, Min } from 'class-validator';
+import { IsUuidString } from '../../../../core/validators/is-uuid-string.decorator';
 
 export class CreateHistoryEntryDto {
     @ApiProperty({ description: 'UUID du titre écouté' })
-    @IsUUID()
+    @IsUuidString()
     titreId: string;
 
     @ApiProperty({ example: 187, description: 'Durée effectivement écoutée, en secondes' })

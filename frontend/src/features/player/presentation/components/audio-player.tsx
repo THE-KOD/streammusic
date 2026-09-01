@@ -14,6 +14,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { usePlayerStore, useCurrentTrack } from '../store/player-store'
 import { formatDuration } from '../../../../shared/utils/format-duration'
+import { historyService } from '../../../listening-history'
+import type { Track } from '../../../../shared/types/track'
 
 export function AudioPlayer() {
     const {
@@ -36,6 +38,8 @@ export function AudioPlayer() {
     const currentTrack = useCurrentTrack()
 
     const audioRef = useRef<HTMLAudioElement>(null)
+    const listenedSecondsRef = useRef(0)
+    const previousTrackRef = useRef<Track | null>(null)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
 
@@ -50,6 +54,7 @@ export function AudioPlayer() {
             setCurrentTime(ct)
             setDuration(dur)
             setProgress(dur > 0 ? (ct / dur) * 100 : 0)
+            listenedSecondsRef.current = ct
         }
 
         const handleLoadedMetadata = () => {
@@ -79,6 +84,17 @@ export function AudioPlayer() {
     useEffect(() => {
         const audio = audioRef.current
         if (!audio || !currentTrack) return
+
+        // Journalise l'écoute du titre PRÉCÉDENT avant de charger le nouveau —
+        // capture le temps réellement écouté (limité à la durée du titre,
+        // au cas où currentTime dépasserait légèrement par imprécision flottante).
+        const previous = previousTrackRef.current
+        if (previous && previous.id !== currentTrack.id) {
+            const clamped = Math.min(Math.floor(listenedSecondsRef.current), previous.duration)
+            historyService.logListen(previous.id, clamped)
+        }
+        previousTrackRef.current = currentTrack
+        listenedSecondsRef.current = 0
 
         audio.src = currentTrack.fileUrl
         audio.load()

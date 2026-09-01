@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsUUID, Min, MinLength } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
+import { IsUuidString } from '../../../../core/validators/is-uuid-string.decorator';
 
 export class SearchQueryDto {
     @ApiProperty({ example: 'midnight' })
@@ -10,7 +11,7 @@ export class SearchQueryDto {
 
     @ApiPropertyOptional({ description: 'Filtre les titres par genre' })
     @IsOptional()
-    @IsUUID()
+    @IsUuidString()
     genreId?: string;
 
     @ApiPropertyOptional({ description: 'Durée minimale des titres, en secondes' })
