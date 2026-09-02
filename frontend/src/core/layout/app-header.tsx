@@ -16,6 +16,7 @@ export function AppHeader() {
     const location = useLocation()
     const navigate = useNavigate()
     const logout = useAuthStore((state) => state.logout)
+    const pseudo = useAuthStore((state) => state.user?.pseudo) ?? 'Utilisateur'
 
     return (
         <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-surface/80 backdrop-blur-md border-b border-white/5">
@@ -49,8 +50,8 @@ export function AppHeader() {
                 ariaLabel="Menu utilisateur"
                 trigger={
                     <span className="flex items-center gap-2 cursor-pointer rounded-full hover:bg-surface-raised/50 p-1 pr-2 transition-colors">
-                        <Avatar name="Utilisateur" size="sm" />
-                        <span className="hidden sm:inline text-sm text-ivory font-body">Utilisateur</span>
+                        <Avatar name={pseudo} size="sm" />
+                        <span className="hidden sm:inline text-sm text-ivory font-body">{pseudo}</span>
                     </span>
                 }
                 items={[
@@ -60,6 +61,7 @@ export function AppHeader() {
                     { label: 'Paramètres', onClick: () => navigate('/settings') },
                     { label: 'Passer Premium', onClick: () => navigate('/premium') },
                     { label: 'Uploader un titre', onClick: () => navigate('/upload') },
+                    { label: 'Mes titres', onClick: () => navigate('/upload/mine') },
                     { label: 'Back-office admin', onClick: () => navigate('/admin') },
                     { label: 'Déconnexion', onClick: async () => { await logout(); navigate('/login') }, variant: 'danger' },
                 ]}

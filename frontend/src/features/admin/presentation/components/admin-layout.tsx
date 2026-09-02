@@ -17,9 +17,10 @@ export function AdminLayout() {
     return (
         <div className="min-h-screen bg-ink flex">
             {/* Sidebar */}
-            <aside className="w-64 bg-surface border-r border-white/10 flex-shrink-0 hidden md:flex flex-col">
+            <aside className="w-64 h-screen sticky top-0 bg-surface border-r border-white/10 flex-shrink-0 hidden md:flex flex-col overflow-y-auto">
                 <div className="p-5 border-b border-white/10">
-                    <Link to="/admin" className="text-ivory font-display text-xl font-semibold flex items-center gap-2.5">
+                    <Link to="/admin"
+                          className="text-ivory font-display text-xl font-semibold flex items-center gap-2.5">
                         <span className="text-amber text-2xl">♪</span>
                         <span>StreamMusic</span>
                     </Link>
@@ -40,10 +41,10 @@ export function AdminLayout() {
                                         : 'text-muted hover:text-ivory hover:bg-surface-raised/50'
                                 )}
                             >
-                                <item.icon className={clsx('w-5 h-5', isActive ? 'text-amber' : '')} />
+                                <item.icon className={clsx('w-5 h-5', isActive ? 'text-amber' : '')}/>
                                 {item.label}
                                 {isActive && (
-                                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber" />
+                                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber"/>
                                 )}
                             </Link>
                         )
@@ -55,7 +56,7 @@ export function AdminLayout() {
                         to="/home"
                         className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-body text-muted hover:text-ivory hover:bg-surface-raised/50 transition-all duration-200"
                     >
-                        <Home className="w-5 h-5" />
+                        <Home className="w-5 h-5"/>
                         Retour à l'app
                     </Link>
                 </div>

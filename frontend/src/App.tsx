@@ -31,6 +31,7 @@ import { AdminModerationPage } from './features/admin/presentation/pages/admin-m
 import { AdminModerationDetailPage } from './features/admin/presentation/pages/admin-moderation-detail-page'
 import { AdminGenresPage } from './features/admin/presentation/pages/admin-genres-page'
 import {NotificationsPage} from "./features/notifications/presentation/pages/notifications-page.tsx";
+import {MyTracksPage} from "./features/upload/presentation/pages/my-tracks-page.tsx";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
               <Route path="/settings/password" element={<PasswordPage />} />
               <Route path="/history" element={<ListeningHistoryPage />} />
               <Route path="/upload" element={<UploadPage />} />
+              <Route path="/upload/mine" element={<MyTracksPage />} />
               <Route path="/premium" element={<PremiumPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
             </Route>

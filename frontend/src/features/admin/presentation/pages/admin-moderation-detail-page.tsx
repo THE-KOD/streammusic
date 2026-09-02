@@ -8,6 +8,7 @@ import { AdminPageHeader } from '../components/admin-page-header.tsx'
 import { useModerationTracks } from '../hooks/use-admin-moderation'
 import { formatDuration } from '../../../../shared/utils/format-duration'
 import { Music, Calendar, Clock, Headphones, Tag, Album } from 'lucide-react'
+import { useToastStore } from '../../../../core/store/toast-store'
 
 export function AdminModerationDetailPage() {
     const { trackId } = useParams()
@@ -16,6 +17,7 @@ export function AdminModerationDetailPage() {
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false)
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
     const [isActionLoading, setIsActionLoading] = useState(false)
+    const showToast = useToastStore((state) => state.showToast)
 
     const track = tracks.find(t => t.id === trackId)
 
@@ -25,6 +27,9 @@ export function AdminModerationDetailPage() {
         try {
             await updateStatus(track.id, 'approved')
             setIsApproveModalOpen(false)
+            showToast('Titre validé avec succès', 'success')
+        } catch {
+            showToast('Erreur lors de la validation du titre', 'error')
         } finally {
             setIsActionLoading(false)
         }
@@ -36,6 +41,9 @@ export function AdminModerationDetailPage() {
         try {
             await updateStatus(track.id, 'rejected')
             setIsRejectModalOpen(false)
+            showToast('Titre rejeté', 'success')
+        } catch {
+            showToast('Erreur lors du rejet du titre', 'error')
         } finally {
             setIsActionLoading(false)
         }
