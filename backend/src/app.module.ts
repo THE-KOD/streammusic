@@ -23,6 +23,7 @@ import { SubscriptionsModule } from './features/subscriptions/subscriptions.modu
 import { SearchModule } from './features/search/search.module';
 import { AdminModule } from './features/admin/admin.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import {StorageModule} from "./infrastructure/storage/storage.module";
 
 
 @Module({
@@ -51,6 +52,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     SubscriptionsModule,
     SearchModule,
     AdminModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
