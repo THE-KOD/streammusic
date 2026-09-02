@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { apiClient } from '../../../../infrastructure/http/api-client'
+import { uploadFile } from '../../../../infrastructure/http/file-upload'
 import type { NewTrackPayload } from '../../domain/upload.entity'
 
 export function useSubmitTrack() {
@@ -10,11 +11,9 @@ export function useSubmitTrack() {
         setIsSubmitting(true)
         setError(null)
         try {
-            // Pas de vrai stockage de fichiers pour l'instant (voir note en tête
-            // de réponse) — URL locale au navigateur, joue réellement le bon
-            // fichier cette session, ne persiste pas après un rechargement.
-            const fichierAudioUrl = URL.createObjectURL(payload.audioFile)
-            const pochetteUrl = payload.coverFile ? URL.createObjectURL(payload.coverFile) : undefined
+            // Upload réel vers le stockage local du backend, avant de créer le titre.
+            const fichierAudioUrl = await uploadFile(payload.audioFile, 'audio')
+            const pochetteUrl = payload.coverFile ? await uploadFile(payload.coverFile, 'image') : undefined
 
             await apiClient.post('/tracks', {
                 titre: payload.title,
