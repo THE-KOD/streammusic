@@ -22,7 +22,7 @@ describe('QueueService', () => {
             findFileIdByUtilisateur: jest.fn(), createFile: jest.fn(), list: jest.fn(),
             isPresent: jest.fn(), getMaxOrdre: jest.fn(), add: jest.fn(), remove: jest.fn(), reorderAll: jest.fn(), clear: jest.fn(),
         };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new QueueService(queueRepository, trackRepository);
     });
 

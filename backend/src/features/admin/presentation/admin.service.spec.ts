@@ -26,7 +26,7 @@ describe('AdminService', () => {
 
     beforeEach(() => {
         utilisateurRepository = { findById: jest.fn(), findByEmail: jest.fn(), findByPseudo: jest.fn(), findAll: jest.fn(), countAll: jest.fn(), save: jest.fn(), delete: jest.fn() };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new AdminService(utilisateurRepository, trackRepository);
     });
 
@@ -50,5 +50,11 @@ describe('AdminService', () => {
     it("suspendUser() leve une 404 si l'utilisateur n'existe pas", async () => {
         utilisateurRepository.findById.mockResolvedValue(null);
         await expect(service.suspendUser('inconnu')).rejects.toThrow(UtilisateurNotFoundError);
+    });
+
+    it('listTracksForModeration() délègue au repository avec le filtre fourni', async () => {
+        trackRepository.findAllForModeration.mockResolvedValue([]);
+        await service.listTracksForModeration('EN_ATTENTE');
+        expect(trackRepository.findAllForModeration).toHaveBeenCalledWith('EN_ATTENTE');
     });
 });

@@ -21,7 +21,7 @@ describe('SuggestionsService', () => {
 
     beforeEach(() => {
         suggestionRepository = { listByUtilisateur: jest.fn(), replaceAllForUtilisateur: jest.fn() };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         historiqueRepository = { save: jest.fn(), listByUtilisateur: jest.fn(), clearForUtilisateur: jest.fn() };
         service = new SuggestionsService(suggestionRepository, trackRepository, historiqueRepository);
     });

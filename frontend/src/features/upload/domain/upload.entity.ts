@@ -1,6 +1,5 @@
 export interface NewTrackPayload {
     title: string
-    artistId: string
     albumId?: string
     genreId: string
     releaseDate?: string

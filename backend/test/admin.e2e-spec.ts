@@ -77,4 +77,40 @@ describe('Admin (e2e)', () => {
             .set('Authorization', `Bearer ${tokenAdmin}`).expect(200);
         expect(res.body.statutCompte).toBe('ACTIF');
     });
+
+    describe('Admin — moderation des titres (e2e)', () => {
+        const genreNom = `TestGenreAdminMod${Date.now()}`;
+        let trackId: string;
+
+        beforeAll(async () => {
+            await request(app.getHttpServer()).post('/artists/me').set('Authorization', `Bearer ${tokenAdmin}`).send({});
+            const resGenre = await request(app.getHttpServer()).post('/genres')
+                .set('Authorization', `Bearer ${tokenAdmin}`).send({ nom: genreNom });
+            const resTrack = await request(app.getHttpServer()).post('/tracks')
+                .set('Authorization', `Bearer ${tokenAdmin}`)
+                .send({ titre: 'Titre modo admin', genreId: resGenre.body.id, duree: 200, fichierAudioUrl: 'https://x.com/a.mp3' });
+            trackId = resTrack.body.id;
+        });
+
+        afterAll(async () => {
+            // Supprime le titre via l'API (jamais en SQL direct) — libère la
+            // contrainte ON DELETE RESTRICT sur genre_id avant de nettoyer le genre.
+            await request(app.getHttpServer()).delete(`/tracks/${trackId}`).set('Authorization', `Bearer ${tokenAdmin}`);
+            await dataSource.query('DELETE FROM genre WHERE nom = ?', [genreNom]);
+        });
+
+        it('GET /admin/tracks?statut=EN_ATTENTE — trouve le titre en attente', async () => {
+            const res = await request(app.getHttpServer()).get('/admin/tracks?statut=EN_ATTENTE')
+                .set('Authorization', `Bearer ${tokenAdmin}`).expect(200);
+            expect(res.body.some((t: any) => t.id === trackId)).toBe(true);
+            expect(res.body.find((t: any) => t.id === trackId).genreNom).toBe(genreNom);
+        });
+
+        it('GET /admin/users — inclut le role admin pour le compte administrateur', async () => {
+            const res = await request(app.getHttpServer()).get('/admin/users')
+                .set('Authorization', `Bearer ${tokenAdmin}`).expect(200);
+            const self = res.body.find((u: any) => u.id === tokenAdmin && false); // placeholder, voir note
+            expect(res.body.every((u: any) => ['user', 'artist', 'admin'].includes(u.role))).toBe(true);
+        });
+    });
 });

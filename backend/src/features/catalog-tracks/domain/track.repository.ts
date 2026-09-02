@@ -15,6 +15,7 @@ export interface TrackRepository {
     save(track: Track): Promise<Track>;
     delete(id: string): Promise<void>;
     countByArtiste(artisteId: string): Promise<number>;
+    findAllForModeration(statut?: 'EN_ATTENTE' | 'VALIDE' | 'REJETE'): Promise<Track[]>;
 }
 
 export const TRACK_REPOSITORY = Symbol('TRACK_REPOSITORY');

@@ -1,6 +1,7 @@
 // features/admin/presentation/components/admin-layout.tsx
 import { Outlet, Link, useLocation } from 'react-router'
 import { LayoutDashboard, Users, Shield, Home } from 'lucide-react'
+import { useAuthStore } from '../../../../core/store/auth-store'
 import clsx from 'clsx'
 
 const navItems = [
@@ -11,6 +12,7 @@ const navItems = [
 
 export function AdminLayout() {
     const location = useLocation()
+    const pseudo = useAuthStore((state) => state.user?.pseudo) ?? 'Admin'
 
     return (
         <div className="min-h-screen bg-ink flex">
@@ -62,23 +64,26 @@ export function AdminLayout() {
             {/* Main content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header */}
-                <header className="bg-surface/80 backdrop-blur-sm border-b border-white/10 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+                <header
+                    className="bg-surface/80 backdrop-blur-sm border-b border-white/10 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
                     <div className="flex items-center gap-3">
                         <h1 className="font-display text-lg font-semibold text-ivory">Back-office</h1>
-                        <span className="px-2 py-0.5 text-xs font-mono text-muted bg-surface-raised rounded-md border border-white/5">
+                        <span
+                            className="px-2 py-0.5 text-xs font-mono text-muted bg-surface-raised rounded-md border border-white/5">
                             v1.0
                         </span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-muted font-body hidden sm:block">Admin</span>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/20 flex items-center justify-center text-ivory font-display text-sm font-semibold shadow-sm">
-                            A
+                        <span className="text-sm text-muted font-body hidden sm:block">{pseudo}</span>
+                        <div
+                            className="w-9 h-9 rounded-full bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/20 flex items-center justify-center text-ivory font-display text-sm font-semibold shadow-sm">
+                            {pseudo.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </header>
 
                 <main className="flex-1 p-8 overflow-auto">
-                    <Outlet />
+                    <Outlet/>
                 </main>
             </div>
         </div>

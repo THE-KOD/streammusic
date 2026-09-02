@@ -55,4 +55,10 @@ export class TypeOrmTrackRepository implements TrackRepository {
         // ce qu'un visiteur de la fiche artiste peut réellement voir/écouter.
         return this.repo.count({ where: { artisteId, statutModeration: 'VALIDE' } });
     }
+
+    async findAllForModeration(statut?: string): Promise<Track[]> {
+        const where = statut ? { statutModeration: statut as any } : {};
+        const all = await this.repo.find({ where, order: { dateAjout: 'DESC' } });
+        return all.map(TrackMapper.toDomain);
+    }
 }

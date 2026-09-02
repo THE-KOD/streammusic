@@ -30,6 +30,7 @@ import { AdminUserDetailPage } from './features/admin/presentation/pages/admin-u
 import { AdminModerationPage } from './features/admin/presentation/pages/admin-moderation-page'
 import { AdminModerationDetailPage } from './features/admin/presentation/pages/admin-moderation-detail-page'
 import { AdminGenresPage } from './features/admin/presentation/pages/admin-genres-page'
+import {NotificationsPage} from "./features/notifications/presentation/pages/notifications-page.tsx";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
               <Route path="/history" element={<ListeningHistoryPage />} />
               <Route path="/upload" element={<UploadPage />} />
               <Route path="/premium" element={<PremiumPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
             </Route>
 
           </Route>

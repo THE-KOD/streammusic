@@ -25,7 +25,7 @@ describe('FavoritesService', () => {
             isTitreFavori: jest.fn(), addTitreFavori: jest.fn(), removeTitreFavori: jest.fn(), listTitreIdsFavoris: jest.fn(),
             isAlbumFavori: jest.fn(), addAlbumFavori: jest.fn(), removeAlbumFavori: jest.fn(), listAlbumIdsFavoris: jest.fn(),
         };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         albumRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), findByArtisteId: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new FavoritesService(favorisRepository, trackRepository, albumRepository);
     });

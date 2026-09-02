@@ -1,5 +1,3 @@
-import type { User } from '../../profile'
-
 export interface AdminStats {
     totalUsers: number
     totalPlays: number
@@ -9,18 +7,29 @@ export interface DashboardTrack {
     id: string
     title: string
     artistName: string
-    artistId: string
-    duration: number
     playCount: number
+}
+
+// Type autonome — ne dépend plus de features/profile. Une vue admin décrit
+// ce que l'admin voit, pas ce qu'un utilisateur "est" dans son propre profil.
+export interface AdminUser {
+    id: string
+    pseudo: string
+    email: string
+    avatarUrl?: string
+    isActive: boolean
+    joinedAt: Date
+    role: 'user' | 'artist' | 'admin'
+    subscriptionTier: 'free' | 'premium'
 }
 
 export interface ModerationTrack {
     id: string
     title: string
-    artistName: string
     artistId: string
+    artistName: string
     albumTitle?: string
-    genreName: string
+    genreName?: string
     duration: number
     releaseDate?: string
     coverUrl?: string
@@ -28,9 +37,4 @@ export interface ModerationTrack {
     submittedAt: string
     playCount?: number
     fileUrl: string
-}
-
-export interface AdminUser extends User {
-    role: 'user' | 'artist' | 'admin'
-    subscriptionTier: 'free' | 'premium'
 }

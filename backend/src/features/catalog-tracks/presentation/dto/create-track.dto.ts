@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString, IsUrl, IsUUID, MaxLength, Min, MinLength } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, MaxLength, Min, MinLength } from 'class-validator';
+import { IsUuidString } from '../../../../core/validators/is-uuid-string.decorator';
 
 export class CreateTrackDto {
     @ApiProperty({ example: 'Midnight Drive' })
@@ -9,27 +10,30 @@ export class CreateTrackDto {
     titre: string;
 
     @ApiProperty({ description: 'UUID du genre — doit déjà exister' })
-    @IsUUID()
+    @IsUuidString()
     genreId: string;
 
-    @ApiPropertyOptional({ description: 'UUID de l\'album — omis pour un single' })
+    @ApiPropertyOptional({ description: "UUID de l'album — omis pour un single" })
     @IsOptional()
-    @IsUUID()
+    @IsUuidString()
     albumId?: string;
 
     @ApiProperty({ example: 222, description: 'Durée en secondes' })
     @IsInt()
-    @Min(1) // miroir de chk_duree du schéma — voir aussi la validation domaine
+    @Min(1)
     duree: number;
 
+    // IsString plutôt que IsUrl : accepte aussi bien une vraie URL de stockage
+    // (à terme) qu'une URL locale blob: (aujourd'hui) — voir la note sur le
+    // stockage différé en tête de réponse.
     @ApiProperty({ example: 'https://storage.example.com/tracks/xyz.mp3' })
-    @IsUrl()
+    @IsString()
     @MaxLength(500)
     fichierAudioUrl: string;
 
     @ApiPropertyOptional({ example: 'https://cdn.example.com/tracks/xyz.jpg' })
     @IsOptional()
-    @IsUrl()
+    @IsString()
     @MaxLength(500)
     pochetteUrl?: string;
 

@@ -20,7 +20,7 @@ describe('ListeningHistoryService', () => {
 
     beforeEach(() => {
         historiqueRepository = { save: jest.fn(), listByUtilisateur: jest.fn(), clearForUtilisateur: jest.fn() };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new ListeningHistoryService(historiqueRepository, trackRepository);
     });
 

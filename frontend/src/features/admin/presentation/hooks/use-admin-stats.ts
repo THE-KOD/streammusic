@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { adminStatsService } from '../../data/admin-mock.service'
+import { adminStatsService } from '../../data/admin.service'
 import type { AdminStats, DashboardTrack } from '../../domain/admin.entity'
 
 export function useAdminStats() {

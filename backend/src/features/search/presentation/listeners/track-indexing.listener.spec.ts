@@ -26,7 +26,7 @@ describe('TrackIndexingListener', () => {
 
     beforeEach(() => {
         searchRepository = { indexTrack: jest.fn(), removeTrack: jest.fn(), search: jest.fn() };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         genreRepository = { findAll: jest.fn(), findById: jest.fn(), findByNom: jest.fn(), save: jest.fn(), delete: jest.fn() };
         albumRepository = { findById: jest.fn(), existsById: jest.fn(), findAll: jest.fn(), findByArtisteId: jest.fn(), save: jest.fn(), delete: jest.fn() };
         utilisateurRepository = { findById: jest.fn(), findByEmail: jest.fn(), findByPseudo: jest.fn(), findAll: jest.fn(), countAll: jest.fn(), save: jest.fn(), delete: jest.fn() };

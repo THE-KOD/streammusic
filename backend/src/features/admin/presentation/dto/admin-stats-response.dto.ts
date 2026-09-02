@@ -4,6 +4,7 @@ export class TopTrackDto {
     @ApiProperty() id: string;
     @ApiProperty() titre: string;
     @ApiProperty() artisteId: string;
+    @ApiProperty() artisteNom: string;
     @ApiProperty() nombreEcoutes: number;
 }
 

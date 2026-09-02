@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { adminUsersService } from '../../data/admin-mock.service'
+import { adminUsersService } from '../../data/admin.service'
 import type { AdminUser } from '../../domain/admin.entity'
 
 export function useAdminUsers() {
@@ -17,7 +17,12 @@ export function useAdminUsers() {
 
     useEffect(reload, [])
 
-    const suspendUser = async (userId: string) => { await adminUsersService.toggleSuspend(userId); reload() }
+    const suspendUser = async (userId: string) => {
+        const user = users.find((u) => u.id === userId)
+        if (!user) return
+        await adminUsersService.toggleSuspend(userId, user.isActive)
+        reload()
+    }
     const deleteUser = async (userId: string) => { await adminUsersService.remove(userId); reload() }
 
     return { users, isLoading, error, suspendUser, deleteUser }

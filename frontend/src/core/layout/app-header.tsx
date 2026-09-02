@@ -54,6 +54,7 @@ export function AppHeader() {
                     </span>
                 }
                 items={[
+                    { label: 'Notifications', onClick: () => navigate('/notifications') },
                     { label: 'Historique', onClick: () => navigate('/history') },
                     { label: 'Profil', onClick: () => navigate('/profile') },
                     { label: 'Paramètres', onClick: () => navigate('/settings') },

@@ -27,7 +27,7 @@ describe('PlaylistsService', () => {
     beforeEach(() => {
         playlistRepository = { findById: jest.fn(), findByProprietaire: jest.fn(), save: jest.fn(), delete: jest.fn() };
         playlistTrackRepository = { list: jest.fn(), count: jest.fn(), isPresent: jest.fn(), getMaxOrdre: jest.fn(), add: jest.fn(), remove: jest.fn(), reorderAll: jest.fn() };
-        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), save: jest.fn(), delete: jest.fn() };
+        trackRepository = { findById: jest.fn(), findAllValide: jest.fn(), findAllByArtiste: jest.fn(), countByArtiste: jest.fn(), findAllForModeration: jest.fn(), save: jest.fn(), delete: jest.fn() };
         service = new PlaylistsService(playlistRepository, playlistTrackRepository, trackRepository);
     });
 

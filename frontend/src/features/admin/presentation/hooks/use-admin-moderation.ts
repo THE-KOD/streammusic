@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { adminModerationService } from '../../data/admin-mock.service'
+import { adminModerationService } from '../../data/admin.service'
 import type { ModerationTrack } from '../../domain/admin.entity'
 
 export function useModerationTracks(filterStatus?: string) {
