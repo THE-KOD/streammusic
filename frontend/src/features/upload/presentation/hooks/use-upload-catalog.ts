@@ -7,13 +7,15 @@ export function useAlbums(artistId?: string) {
     const [albums, setAlbums] = useState<Album[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
-    useEffect(() => {
+    const reload = () => {
         if (!artistId) { setAlbums([]); return }
         setIsLoading(true)
         uploadCatalogService.listAlbumsByArtist(artistId).then(setAlbums).finally(() => setIsLoading(false))
-    }, [artistId])
+    }
 
-    return { albums, isLoading }
+    useEffect(reload, [artistId])
+
+    return { albums, isLoading, reload }
 }
 
 export function useGenres() {

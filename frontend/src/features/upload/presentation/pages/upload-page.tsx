@@ -13,6 +13,7 @@ import { useMyArtist } from '../hooks/use-my-artist'
 import { uploadCatalogService } from '../../data/upload-catalog.service'
 import { useToastStore } from '../../../../core/store/toast-store'
 import { Upload, CheckCircle2, Mic } from 'lucide-react'
+import { CreateAlbumModal } from '../components/create-album-modal'
 
 export function UploadPage() {
   const navigate = useNavigate()
@@ -28,8 +29,9 @@ export function UploadPage() {
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isBecomingArtist, setIsBecomingArtist] = useState(false)
+  const [isCreateAlbumOpen, setIsCreateAlbumOpen] = useState(false)
 
-  const { albums, isLoading: albumsLoading } = useAlbums(myArtist.artist?.id)
+  const { albums, isLoading: albumsLoading, reload: reloadAlbums } = useAlbums(myArtist.artist?.id)
   const { genres, isLoading: genresLoading } = useGenres()
   const { isSubmitting, error: submitError, submit } = useSubmitTrack()
 
@@ -76,6 +78,13 @@ export function UploadPage() {
     } finally {
       setIsBecomingArtist(false)
     }
+  }
+
+  const handleCreateAlbum = async (title: string, releaseDate: string) => {
+    const newAlbum = await uploadCatalogService.createAlbum(title, releaseDate)
+    reloadAlbums()
+    setAlbumId(newAlbum.id) // sélectionne automatiquement le nouvel album
+    showToast('Album créé', 'success')
   }
 
   const isFormValid = title.trim() && genreId && audioFile
@@ -142,26 +151,50 @@ export function UploadPage() {
           </div>
 
           <div className="space-y-4">
-            <Input label="Titre du morceau" required value={title} onChange={(e) => setTitle(e.target.value)} error={errors.title} placeholder="Entrez le titre de votre morceau" disabled={isSubmitting} className="text-base" />
+            <Input label="Titre du morceau" required value={title} onChange={(e) => setTitle(e.target.value)}
+                   error={errors.title} placeholder="Entrez le titre de votre morceau" disabled={isSubmitting}
+                   className="text-base"/>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SelectField label="Album" options={albumOptions} value={albumId} onChange={setAlbumId} placeholder="Sélectionner un album (optionnel)" disabled={isSubmitting || albumsLoading} isLoading={albumsLoading} />
-              <SelectField label="Genre" required options={genreOptions} value={genreId} onChange={setGenreId} placeholder="Sélectionner un genre" error={errors.genre} disabled={isSubmitting || genresLoading} isLoading={genresLoading} />
+              <div className="space-y-1.5">
+                <SelectField label="Album" options={albumOptions} value={albumId} onChange={setAlbumId}
+                             placeholder="Sélectionner un album (optionnel)" disabled={isSubmitting || albumsLoading}
+                             isLoading={albumsLoading}/>
+                <button
+                    type="button"
+                    onClick={() => setIsCreateAlbumOpen(true)}
+                    disabled={isSubmitting}
+                    className="text-xs text-teal hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  + Créer un nouvel album
+                </button>
+              </div>
+              <SelectField label="Genre" required options={genreOptions} value={genreId} onChange={setGenreId}
+                           placeholder="Sélectionner un genre" error={errors.genre}
+                           disabled={isSubmitting || genresLoading} isLoading={genresLoading}/>
             </div>
 
-            <Input label="Date de sortie" type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} disabled={isSubmitting} />
+            <Input label="Date de sortie" type="date" value={releaseDate}
+                   onChange={(e) => setReleaseDate(e.target.value)} disabled={isSubmitting}/>
           </div>
         </Card>
 
         <Card className="p-5 border border-white/5 hover:border-white/10 transition-all duration-200">
           <div className="flex items-center gap-2 mb-4">
-            <span className="w-1 h-4 bg-amber rounded-full" />
+            <span className="w-1 h-4 bg-amber rounded-full"/>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted font-body">Fichier audio</h3>
             <span className="text-[10px] text-danger font-medium ml-auto">* Obligatoire</span>
           </div>
           <AudioFileUpload
-              onFileSelect={(file, duration) => { setAudioFile(file); setAudioDuration(duration); setErrors((prev) => ({ ...prev, audio: '' })) }}
-              onRemove={() => { setAudioFile(null); setAudioDuration(null) }}
+              onFileSelect={(file, duration) => {
+                setAudioFile(file);
+                setAudioDuration(duration);
+                setErrors((prev) => ({...prev, audio: ''}))
+              }}
+              onRemove={() => {
+                setAudioFile(null);
+                setAudioDuration(null)
+              }}
               error={errors.audio}
               disabled={isSubmitting}
           />
@@ -190,6 +223,8 @@ export function UploadPage() {
             </div>
           </div>
         </Card>
+
+        <CreateAlbumModal isOpen={isCreateAlbumOpen} onClose={() => setIsCreateAlbumOpen(false)} onCreate={handleCreateAlbum} />
       </div>
   )
 }

@@ -40,4 +40,9 @@ export const uploadCatalogService = {
     async becomeArtist(): Promise<void> {
         await apiClient.post('/artists/me', {})
     },
+
+    async createAlbum(title: string, releaseDate: string): Promise<Album> {
+        const { data } = await apiClient.post<BackendAlbumDto>('/albums', { titre: title, dateSortie: releaseDate })
+        return { id: data.id, title: data.titre, artistName: data.artisteNom, artistId: data.artisteId, releaseDate: data.dateSortie, coverUrl: data.pochetteUrl ?? undefined }
+    },
 }

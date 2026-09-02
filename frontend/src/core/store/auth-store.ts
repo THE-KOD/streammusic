@@ -13,13 +13,16 @@ interface AuthState {
     refreshToken: string | null
     user: AuthUser | null
     isAuthenticated: boolean
+    isAdmin: boolean
     setSession: (accessToken: string, refreshToken: string, user: AuthUser) => void
     setTokens: (accessToken: string, refreshToken: string) => void
-    // Local uniquement — utilisé par l'intercepteur HTTP quand un refresh échoue.
-    // Ne doit jamais rappeler le backend (la session y est déjà invalide).
     clearSession: () => void
-    // Déconnexion "volontaire" — révoque aussi la session côté serveur.
     logout: () => Promise<void>
+    // Vérifie le statut admin en tentant une route déjà protégée par
+    // AdminGuard côté backend (/admin/stats) — 200 = admin, 403 = non-admin.
+    // Volontairement dans ce store (pas dans features/admin) : AppHeader vit
+    // dans core/, ne peut pas importer une feature.
+    checkAdminStatus: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -29,9 +32,13 @@ export const useAuthStore = create<AuthState>()(
             refreshToken: null,
             user: null,
             isAuthenticated: false,
-            setSession: (accessToken, refreshToken, user) => set({ accessToken, refreshToken, user, isAuthenticated: true }),
+            isAdmin: false,
+            setSession: (accessToken, refreshToken, user) => {
+                set({ accessToken, refreshToken, user, isAuthenticated: true })
+                void get().checkAdminStatus()
+            },
             setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-            clearSession: () => set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false }),
+            clearSession: () => set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false, isAdmin: false }),
             logout: async () => {
                 try {
                     await apiClient.post('/auth/logout')
@@ -39,6 +46,14 @@ export const useAuthStore = create<AuthState>()(
                     // La déconnexion locale doit réussir même si l'appel réseau échoue.
                 } finally {
                     get().clearSession()
+                }
+            },
+            checkAdminStatus: async () => {
+                try {
+                    await apiClient.get('/admin/stats')
+                    set({ isAdmin: true })
+                } catch {
+                    set({ isAdmin: false })
                 }
             },
         }),
