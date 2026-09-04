@@ -1,3 +1,4 @@
+import {uploadFile} from "../../../infrastructure/http/file-upload.ts";
 import { apiClient } from '../../../infrastructure/http/api-client'
 import { mapTrackResponse, type BackendTrackDto } from '../../../shared/utils/map-track-response'
 import { dedupeById } from '../../../shared/utils/dedupe-by-id'
@@ -63,4 +64,10 @@ export const artistProfileService = {
 
         return { artist, tracks, albums }
     },
+
+    async updateMyProfile(artistId: string, bio: string, photoFile: File | null): Promise<void> {
+        const photoArtisteUrl = photoFile ? await uploadFile(photoFile, 'image') : undefined
+        await apiClient.patch(`/artists/${artistId}`, { biographie: bio || undefined, photoArtisteUrl })
+    },
+
 }

@@ -7,7 +7,7 @@ import { useHomeSections } from '../hooks/use-home-sections'
 import { usePlayerStore, useCurrentTrack } from '../../../player/presentation/store/player-store'
 import type { Track } from '../../../../shared/types/track'
 import { dedupeById } from '../../../../shared/utils/dedupe-by-id'
-
+import { useAuthStore } from '../../../../core/store/auth-store'
 
 // ── TrackGrid (remplace uniquement cette fonction) ──
 function TrackGrid({ tracks }: { tracks: Track[] }) {
@@ -69,10 +69,11 @@ function Section({
 // ── Page principale ──
 export function HomePage() {
     const { popular, newReleases, recommendations } = useHomeSections()
+    const pseudo = useAuthStore((state) => state.user?.pseudo) ?? 'Utilisateur'
 
     return (
         <div className="space-y-8">
-            <Greeting pseudo="Utilisateur" />
+            <Greeting pseudo={pseudo} />
 
             <Section title="Titres populaires" state={popular}>
                 <TrackGrid tracks={popular.data} />

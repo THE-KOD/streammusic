@@ -1,4 +1,6 @@
 import { apiClient } from '../../../infrastructure/http/api-client'
+import { uploadFile } from '../../../infrastructure/http/file-upload'
+
 import { dedupeById } from '../../../shared/utils/dedupe-by-id'
 import type { AlbumDetail, AlbumTrack } from '../domain/album-detail.entity'
 
@@ -41,5 +43,10 @@ export const albumDetailService = {
         )
 
         return { album, tracks }
+    },
+
+    async updateCover(albumId: string, coverFile: File): Promise<void> {
+        const pochetteUrl = await uploadFile(coverFile, 'image')
+        await apiClient.patch(`/albums/${albumId}`, { pochetteUrl })
     },
 }

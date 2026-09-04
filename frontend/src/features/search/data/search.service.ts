@@ -41,4 +41,20 @@ export const searchService = {
             albums: data.albums.map((a) => ({ id: a.id, title: a.titre, artistName: a.artisteNom, artistId: a.artisteId, releaseDate: a.dateSortie, coverUrl: a.pochetteUrl ?? undefined })),
         }
     },
+
+    // Aperçu affiché avant toute recherche — réutilise directement les
+    // endpoints du catalogue (pas /search) puisqu'aucun terme n'est saisi.
+    async browse(): Promise<SearchResults> {
+        const PREVIEW_LIMIT = 8
+        const [tracksRes, artistsRes, albumsRes] = await Promise.all([
+            apiClient.get<BackendTrackDto[]>('/tracks'),
+            apiClient.get<BackendArtistResult[]>('/artists'),
+            apiClient.get<BackendAlbumResult[]>('/albums'),
+        ])
+        return {
+            tracks: tracksRes.data.slice(0, PREVIEW_LIMIT).map(mapTrackResponse),
+            artists: artistsRes.data.slice(0, PREVIEW_LIMIT).map((a) => ({ id: a.id, name: a.pseudo, imageUrl: a.photoProfilUrl })),
+            albums: albumsRes.data.slice(0, PREVIEW_LIMIT).map((a) => ({ id: a.id, title: a.titre, artistName: a.artisteNom, artistId: a.artisteId, releaseDate: a.dateSortie, coverUrl: a.pochetteUrl ?? undefined })),
+        }
+    },
 }

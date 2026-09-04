@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Modal } from '../../../../shared/components/modal'
 import { Input } from '../../../../shared/components/input'
 import { Button } from '../../../../shared/components/button'
-import { CoverImageUpload } from './cover-image-upload'
+import { CoverImageUpload } from '../../../../shared/components/cover-image-upload.tsx'
 
 interface CreateAlbumModalProps {
     isOpen: boolean

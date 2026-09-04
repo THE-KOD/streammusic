@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { albumDetailService } from '../../data/album-detail.service'
 import type { AlbumDetail, AlbumTrack } from '../../domain/album-detail.entity'
 
@@ -11,7 +11,7 @@ interface AlbumDetailState {
 export function useAlbumDetail(albumId: string | undefined) {
     const [state, setState] = useState<AlbumDetailState>({ album: null, tracks: [], isLoading: true })
 
-    useEffect(() => {
+    const reload = useCallback(() => {
         if (!albumId) { setState({ album: null, tracks: [], isLoading: false }); return }
         setState((prev) => ({ ...prev, isLoading: true }))
         albumDetailService.getAlbumDetail(albumId)
@@ -19,5 +19,7 @@ export function useAlbumDetail(albumId: string | undefined) {
             .catch(() => setState({ album: null, tracks: [], isLoading: false }))
     }, [albumId])
 
-    return state
+    useEffect(reload, [reload])
+
+    return { ...state, reload }
 }

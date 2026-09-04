@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { artistProfileService } from '../../data/artist-profile.service'
 import type { ArtistProfile } from '../../domain/artist-profile.entity'
 import type { Track } from '../../../../shared/types/track'
@@ -14,7 +14,7 @@ interface ArtistProfileState {
 export function useArtistProfile(artistId: string | undefined) {
     const [state, setState] = useState<ArtistProfileState>({ artist: null, tracks: [], albums: [], isLoading: true })
 
-    useEffect(() => {
+    const reload = useCallback(() => {
         if (!artistId) { setState({ artist: null, tracks: [], albums: [], isLoading: false }); return }
         setState((prev) => ({ ...prev, isLoading: true }))
         artistProfileService.getArtistProfile(artistId)
@@ -22,5 +22,7 @@ export function useArtistProfile(artistId: string | undefined) {
             .catch(() => setState({ artist: null, tracks: [], albums: [], isLoading: false }))
     }, [artistId])
 
-    return state
+    useEffect(reload, [reload])
+
+    return { ...state, reload }
 }
