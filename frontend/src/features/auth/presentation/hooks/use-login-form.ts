@@ -20,7 +20,7 @@ export function useLoginForm() {
         setIsSubmitting(true)
         try {
             const { tokens, user } = await authService.login({ email, password })
-            setSession(tokens.accessToken, tokens.refreshToken, user)
+            setSession(tokens.accessToken, tokens.refreshToken, { id: user.id, pseudo: user.pseudo, email: user.email }, user.isAdmin)
             showToast('Connexion réussie', 'success')
             navigate('/home')
         } catch (err) {

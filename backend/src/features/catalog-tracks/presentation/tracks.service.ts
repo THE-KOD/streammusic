@@ -137,14 +137,21 @@ export class TracksService {
 
     async moderer(id: string, statut: 'VALIDE' | 'REJETE', moderateurId: string): Promise<Track> {
         const track = await this.getById(id);
+        const statutPrecedent = track.statutModeration;
+
         if (statut === 'VALIDE') track.valider(moderateurId);
         else track.rejeter(moderateurId);
         const saved = await this.trackRepository.save(track);
 
-        if (statut === 'VALIDE') {
-            this.eventEmitter.emit(TRACK_VALIDATED_EVENT, new TrackValidatedEvent(saved.id, saved.titre, saved.artisteId));
-        } else {
-            this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(saved.id));
+        // N'émet un événement QUE si le statut a réellement changé — sans ça,
+        // re-valider un titre déjà validé renvoyait une notification "nouvelle
+        // sortie" en double à tous les followers de l'artiste.
+        if (statutPrecedent !== statut) {
+            if (statut === 'VALIDE') {
+                this.eventEmitter.emit(TRACK_VALIDATED_EVENT, new TrackValidatedEvent(saved.id, saved.titre, saved.artisteId));
+            } else {
+                this.eventEmitter.emit(TRACK_UNPUBLISHED_EVENT, new TrackUnpublishedEvent(saved.id));
+            }
         }
 
         return saved;

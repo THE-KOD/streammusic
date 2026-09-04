@@ -168,17 +168,19 @@ export function AdminModerationDetailPage() {
                             variant="danger"
                             size="lg"
                             onClick={() => setIsRejectModalOpen(true)}
+                            disabled={track.status === 'rejected'}
                             className="gap-2"
                         >
-                            Rejeter
+                            {track.status === 'rejected' ? 'Déjà rejeté' : 'Rejeter'}
                         </Button>
                         <Button
                             variant="primary"
                             size="lg"
                             onClick={() => setIsApproveModalOpen(true)}
+                            disabled={track.status === 'approved'}
                             className="gap-2"
                         >
-                            Valider
+                            {track.status === 'approved' ? 'Déjà validé' : 'Valider'}
                         </Button>
                     </div>
                 </Card>

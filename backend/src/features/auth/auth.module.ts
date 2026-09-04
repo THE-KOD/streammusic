@@ -14,15 +14,10 @@ import { TOKEN_GENERATOR } from './domain/token-generator';
 import { AuthService } from './presentation/auth.service';
 import { AuthController } from './presentation/auth.controller';
 import { JwtStrategy } from './presentation/strategies/jwt.strategy';
+import {AdminAccessModule} from "../admin/admin-access.module";
 
 @Module({
-    imports: [
-        UsersModule,
-        SubscriptionsModule, // nouveau
-        TypeOrmModule.forFeature([SessionOrmEntity]),
-        JwtModule.register({}),
-        PassportModule,
-    ],
+    imports: [UsersModule, SubscriptionsModule, AdminAccessModule, TypeOrmModule.forFeature([SessionOrmEntity]), JwtModule.register({}), PassportModule],
     controllers: [AuthController],
     providers: [
         { provide: SESSION_REPOSITORY, useClass: TypeOrmSessionRepository },

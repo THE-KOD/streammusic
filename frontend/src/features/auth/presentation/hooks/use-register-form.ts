@@ -24,7 +24,7 @@ export function useRegisterForm() {
             // déjà des tokens) — amélioration naturelle par rapport au mock, qui
             // redirigeait vers /login et forçait une double saisie.
             const { tokens, user } = await authService.register({ pseudo, email, password })
-            setSession(tokens.accessToken, tokens.refreshToken, user)
+            setSession(tokens.accessToken, tokens.refreshToken, { id: user.id, pseudo: user.pseudo, email: user.email }, user.isAdmin)
             showToast('Compte créé avec succès', 'success')
             navigate('/home')
         } catch (err) {

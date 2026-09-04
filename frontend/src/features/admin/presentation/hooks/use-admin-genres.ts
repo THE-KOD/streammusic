@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { adminGenresService } from '../../data/admin-mock.service'
+import { adminGenresService } from '../../data/admin.service.ts'
 import type { Genre } from '../../../../shared/types/genre'
 
 export function useAdminGenres() {

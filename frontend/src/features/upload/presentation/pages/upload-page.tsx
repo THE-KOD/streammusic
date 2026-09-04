@@ -80,10 +80,10 @@ export function UploadPage() {
     }
   }
 
-  const handleCreateAlbum = async (title: string, releaseDate: string) => {
-    const newAlbum = await uploadCatalogService.createAlbum(title, releaseDate)
+  const handleCreateAlbum = async (title: string, releaseDate: string, coverFile: File | null) => {
+    const newAlbum = await uploadCatalogService.createAlbum(title, releaseDate, coverFile)
     reloadAlbums()
-    setAlbumId(newAlbum.id) // sélectionne automatiquement le nouvel album
+    setAlbumId(newAlbum.id)
     showToast('Album créé', 'success')
   }
 

@@ -116,4 +116,18 @@ describe('TracksService', () => {
         await svc.remove('t1', 'a1');
         expect(emit).toHaveBeenCalledWith('track.unpublished', expect.objectContaining({ titreId: 't1' }));
     });
+    it("n'émet aucun événement si le statut ne change pas (déjà VALIDE)", async () => {
+        const track = Track.create({
+            id: 't1', albumId: null, artisteId: 'a1', genreId: 'g1', titre: 'T', duree: 200,
+            fichierAudioUrl: 'https://x.com/a.mp3', pochetteUrl: null, dateSortie: null,
+            nombreEcoutes: 0, dateAjout: new Date(), statutModeration: 'VALIDE', moderateurId: 'admin-0', dateModeration: new Date(),
+        });
+        trackRepository.findById.mockResolvedValue(track);
+        trackRepository.save.mockImplementation(async (t) => t);
+        const emit = jest.fn();
+        const svc = new TracksService(trackRepository, artisteRepository, genreRepository, albumRepository, { emit } as any);
+
+        await svc.moderer('t1', 'VALIDE', 'admin-1');
+        expect(emit).not.toHaveBeenCalled();
+    });
 });

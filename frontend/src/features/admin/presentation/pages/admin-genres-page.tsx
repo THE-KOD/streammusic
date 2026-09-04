@@ -20,19 +20,28 @@ export function AdminGenresPage() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [deleteGenreId, setDeleteGenreId] = useState<string | null>(null)
     const [isActionLoading, setIsActionLoading] = useState(false)
+    const showToast = useToastStore((state) => state.showToast)
+
 
     const handleCreate = async (name: string) => {
-        await createGenre(name)
+        try {
+            await createGenre(name)
+            showToast('Genre créé avec succès', 'success')
+        } catch {
+            showToast('Erreur lors de la création du genre', 'error')
+        }
     }
 
     const handleUpdate = async (name: string) => {
         if (!editingGenre) return
-        await updateGenre(editingGenre.id, name)
-        setEditingGenre(null)
+        try {
+            await updateGenre(editingGenre.id, name)
+            setEditingGenre(null)
+            showToast('Genre modifié avec succès', 'success')
+        } catch {
+            showToast('Erreur lors de la modification du genre', 'error')
+        }
     }
-
-
-    const showToast = useToastStore((state) => state.showToast)
 
     const handleDelete = async () => {
         if (!deleteGenreId) return
@@ -41,6 +50,7 @@ export function AdminGenresPage() {
             await deleteGenre(deleteGenreId)
             setIsDeleteModalOpen(false)
             setDeleteGenreId(null)
+            showToast('Genre supprimé avec succès', 'success')
         } catch (err) {
             showToast(err instanceof Error ? err.message : 'Suppression impossible.', 'error')
         } finally {

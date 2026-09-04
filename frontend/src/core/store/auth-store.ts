@@ -14,15 +14,13 @@ interface AuthState {
     user: AuthUser | null
     isAuthenticated: boolean
     isAdmin: boolean
-    setSession: (accessToken: string, refreshToken: string, user: AuthUser) => void
+    // isAdmin fourni directement par le backend à la connexion — plus de
+    // vérification a posteriori via une route protégée (voir explication
+    // du fix du 403 systématique).
+    setSession: (accessToken: string, refreshToken: string, user: AuthUser, isAdmin: boolean) => void
     setTokens: (accessToken: string, refreshToken: string) => void
     clearSession: () => void
     logout: () => Promise<void>
-    // Vérifie le statut admin en tentant une route déjà protégée par
-    // AdminGuard côté backend (/admin/stats) — 200 = admin, 403 = non-admin.
-    // Volontairement dans ce store (pas dans features/admin) : AppHeader vit
-    // dans core/, ne peut pas importer une feature.
-    checkAdminStatus: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -33,10 +31,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             isAdmin: false,
-            setSession: (accessToken, refreshToken, user) => {
-                set({ accessToken, refreshToken, user, isAuthenticated: true })
-                void get().checkAdminStatus()
-            },
+            setSession: (accessToken, refreshToken, user, isAdmin) => set({ accessToken, refreshToken, user, isAuthenticated: true, isAdmin }),
             setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
             clearSession: () => set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false, isAdmin: false }),
             logout: async () => {
@@ -46,14 +41,6 @@ export const useAuthStore = create<AuthState>()(
                     // La déconnexion locale doit réussir même si l'appel réseau échoue.
                 } finally {
                     get().clearSession()
-                }
-            },
-            checkAdminStatus: async () => {
-                try {
-                    await apiClient.get('/admin/stats')
-                    set({ isAdmin: true })
-                } catch {
-                    set({ isAdmin: false })
                 }
             },
         }),

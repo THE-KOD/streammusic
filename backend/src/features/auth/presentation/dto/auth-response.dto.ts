@@ -4,6 +4,7 @@ class UtilisateurPublicDto {
     @ApiProperty() id: string;
     @ApiProperty() pseudo: string;
     @ApiProperty() email: string;
+    @ApiProperty() isAdmin: boolean;
 }
 
 export class AuthResponseDto {
