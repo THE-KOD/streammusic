@@ -1,7 +1,7 @@
 // features/catalog-artist-profile/presentation/pages/artist-profile-page.tsx
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { ArrowLeft, Pencil, User } from 'lucide-react'
 import { Button } from '../../../../shared/components/button'
 import { ArtistHero } from '../components/artist-hero'
 import { FollowButton } from '../components/follow-button'
@@ -33,7 +33,16 @@ export function ArtistProfilePage() {
 
     if (isLoading) return <LoadingState />
     if (!artist) {
-        return <EmptyState message="Artiste introuvable." action={<button onClick={() => navigate('/home')} className="text-teal hover:underline">Retour</button>} />
+        return (
+            <EmptyState
+                message="Artiste introuvable."
+                action={
+                    <Button variant="secondary" size="md" onClick={() => navigate('/home')}>
+                        Retour à l'accueil
+                    </Button>
+                }
+            />
+        )
     }
 
     const isOwnProfile = currentUserId === artistId
@@ -47,37 +56,81 @@ export function ArtistProfilePage() {
 
     return (
         <div className="space-y-8">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-muted hover:text-ivory transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-                Retour
-            </button>
+            {/* Barre de navigation supérieure */}
+            <div className="flex items-center justify-between">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="group flex items-center gap-2 text-sm font-body text-muted hover:text-ivory transition-all duration-200"
+                >
+          <span className="p-1.5 rounded-lg bg-surface-raised/50 border border-white/5 group-hover:bg-surface-raised/80 group-hover:border-white/10 transition-all duration-200">
+            <ArrowLeft className="w-4 h-4" />
+          </span>
+                    <span className="hidden sm:inline">Retour</span>
+                </button>
 
-            <ArtistHero name={artist.name} imageUrl={artist.imageUrl} bio={artist.bio}>
-                {isOwnProfile ? (
-                    <Button variant="ghost" size="sm" onClick={() => setIsEditOpen(true)} className="gap-1.5">
+                {isOwnProfile && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditOpen(true)}
+                        className="gap-2 text-muted hover:text-ivory border border-white/5 hover:border-white/10 bg-surface-raised/30 hover:bg-surface-raised transition-all duration-200"
+                    >
                         <Pencil className="w-3.5 h-3.5" />
-                        Modifier mon profil
+                        <span className="hidden sm:inline">Modifier mon profil</span>
+                        <span className="sm:hidden">Modifier</span>
                     </Button>
+                )}
+            </div>
+
+            {/* Hero artiste */}
+            <ArtistHero
+                name={artist.name}
+                imageUrl={artist.imageUrl}
+                bio={artist.bio}
+            >
+                {isOwnProfile ? (
+                    <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal/10 border border-teal/20 text-xs font-medium text-teal">
+                            <User className="w-3.5 h-3.5" />
+                            Mon profil
+                        </div>
+                    </div>
                 ) : (
-                    <FollowButton isFollowing={follow.isFollowing} isLoading={follow.isLoading} error={follow.error} onToggle={follow.toggle} onClearError={follow.clearError} />
+                    <FollowButton
+                        isFollowing={follow.isFollowing}
+                        isLoading={follow.isLoading}
+                        error={follow.error}
+                        onToggle={follow.toggle}
+                        onClearError={follow.clearError}
+                    />
                 )}
             </ArtistHero>
 
+            {/* Sections */}
             <PopularTracksSection
                 tracks={tracks}
-                // Corrige la lecture cassée (point 5-3) : appelait auparavant
-                // uniquement setPlayingTrackId (état purement visuel), jamais
-                // playTrack() du store — donc rien ne jouait réellement.
-                onPlay={(trackId) => { const t = tracks.find((tr) => tr.id === trackId); if (t) playTrack(t, tracks) }}
+                onPlay={(trackId) => {
+                    const t = tracks.find((tr) => tr.id === trackId)
+                    if (t) playTrack(t, tracks)
+                }}
                 onToggleLike={toggleLike}
                 likedTrackIds={likedTrackIds}
                 playingTrackId={isPlaying ? currentTrack?.id : undefined}
             />
 
-            <AlbumsSection albums={albums} onAlbumClick={(albumId) => navigate(`/albums/${albumId}`)} />
+            <AlbumsSection
+                albums={albums}
+                onAlbumClick={(albumId) => navigate(`/albums/${albumId}`)}
+            />
 
+            {/* Modal d'édition */}
             {isOwnProfile && (
-                <EditArtistProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} initialBio={artist.bio} onSave={handleSaveProfile} />
+                <EditArtistProfileModal
+                    isOpen={isEditOpen}
+                    onClose={() => setIsEditOpen(false)}
+                    initialBio={artist.bio}
+                    onSave={handleSaveProfile}
+                />
             )}
         </div>
     )

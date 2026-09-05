@@ -1,7 +1,7 @@
 // features/catalog-album-detail/presentation/pages/album-detail-page.tsx
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { ArrowLeft, Image } from 'lucide-react'
 import { Button } from '../../../../shared/components/button'
 import { AlbumHero } from '../components/album-hero'
 import { AlbumActions } from '../components/album-actions'
@@ -33,14 +33,30 @@ export function AlbumDetailPage() {
 
     if (isLoading) return <LoadingState />
     if (!album) {
-        return <EmptyState message="Album introuvable." action={<button onClick={() => navigate('/home')} className="text-teal hover:underline">Retour</button>} />
+        return (
+            <EmptyState
+                message="Album introuvable."
+                action={
+                    <Button variant="secondary" size="md" onClick={() => navigate('/home')}>
+                        Retour à l'accueil
+                    </Button>
+                }
+            />
+        )
     }
 
     const isOwner = currentUserId === album.artistId
 
     const toPlayableTrack = (t: AlbumTrack): Track => ({
-        id: t.id, title: t.title, artistName: album.artistName ?? 'Artiste inconnu', artistId: album.artistId ?? '',
-        albumTitle: album.title, albumId: album.id, duration: t.duration, coverUrl: album.coverUrl, fileUrl: t.fileUrl,
+        id: t.id,
+        title: t.title,
+        artistName: album.artistName ?? 'Artiste inconnu',
+        artistId: album.artistId ?? '',
+        albumTitle: album.title,
+        albumId: album.id,
+        duration: t.duration,
+        coverUrl: album.coverUrl,
+        fileUrl: t.fileUrl,
     })
     const playableQueue = tracks.map(toPlayableTrack)
 
@@ -53,11 +69,33 @@ export function AlbumDetailPage() {
 
     return (
         <div className="space-y-8">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-muted hover:text-ivory transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-                Retour
-            </button>
+            {/* Barre de navigation supérieure */}
+            <div className="flex items-center justify-between">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="group flex items-center gap-2 text-sm font-body text-muted hover:text-ivory transition-all duration-200"
+                >
+          <span className="p-1.5 rounded-lg bg-surface-raised/50 border border-white/5 group-hover:bg-surface-raised/80 group-hover:border-white/10 transition-all duration-200">
+            <ArrowLeft className="w-4 h-4" />
+          </span>
+                    <span className="hidden sm:inline">Retour</span>
+                </button>
 
+                {isOwner && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditCoverOpen(true)}
+                        className="gap-2 text-muted hover:text-ivory border border-white/5 hover:border-white/10 bg-surface-raised/30 hover:bg-surface-raised transition-all duration-200"
+                    >
+                        <Image className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Modifier la pochette</span>
+                        <span className="sm:hidden">Pochette</span>
+                    </Button>
+                )}
+            </div>
+
+            {/* Hero album */}
             <div className="relative">
                 <AlbumHero
                     title={album.title}
@@ -67,17 +105,27 @@ export function AlbumDetailPage() {
                     coverUrl={album.coverUrl}
                     onArtistClick={album.artistId ? () => navigate(`/artists/${album.artistId}`) : undefined}
                 />
+
                 {isOwner && (
-                    <Button variant="ghost" size="sm" onClick={() => setIsEditCoverOpen(true)} className="absolute top-4 right-4 gap-1.5 bg-ink/60 backdrop-blur-sm">
-                        <Pencil className="w-3.5 h-3.5" />
-                        Modifier la pochette
-                    </Button>
+                    <div className="absolute top-4 right-4 flex items-center gap-2">
+            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber/10 border border-amber/20 text-xs font-medium text-amber">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber" />
+              Propriétaire
+            </span>
+                    </div>
                 )}
             </div>
 
-            <AlbumActions trackCount={tracks.length} onPlayAll={() => playableQueue.length > 0 && playTrack(playableQueue[0], playableQueue)} isSaved={isSaved} onToggleSave={toggle} />
+            {/* Actions */}
+            <AlbumActions
+                trackCount={tracks.length}
+                onPlayAll={() => playableQueue.length > 0 && playTrack(playableQueue[0], playableQueue)}
+                isSaved={isSaved}
+                onToggleSave={toggle}
+            />
 
-            <section className="bg-surface/40 backdrop-blur-sm rounded-xl p-4 border border-white/5 animate-fade-in">
+            {/* Liste des titres */}
+            <section className="bg-surface/40 backdrop-blur-sm rounded-xl p-5 border border-white/5 hover:border-white/10 transition-all duration-200">
                 <SectionHeader title="Titres" />
                 {tracks.length === 0 ? (
                     <EmptyState message="Cet album ne contient aucun titre disponible." />
@@ -102,8 +150,13 @@ export function AlbumDetailPage() {
                 )}
             </section>
 
+            {/* Modal d'édition */}
             {isOwner && (
-                <EditAlbumCoverModal isOpen={isEditCoverOpen} onClose={() => setIsEditCoverOpen(false)} onSave={handleUpdateCover} />
+                <EditAlbumCoverModal
+                    isOpen={isEditCoverOpen}
+                    onClose={() => setIsEditCoverOpen(false)}
+                    onSave={handleUpdateCover}
+                />
             )}
         </div>
     )

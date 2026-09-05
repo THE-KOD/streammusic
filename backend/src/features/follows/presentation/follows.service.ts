@@ -23,10 +23,8 @@ export class FollowsService {
 
     async follow(followerId: string, artisteId: string): Promise<void> {
         if (followerId === artisteId) throw new NeSuitPasSoiMemeError();
-
         const existe = await this.artisteRepository.existsById(artisteId);
         if (!existe) throw new ArtisteNotFoundError(artisteId);
-
         await this.followsRepository.follow(followerId, artisteId);
     }
 
@@ -42,8 +40,19 @@ export class FollowsService {
         const artisteIds = await this.followsRepository.listArtisteIdsFollowed(followerId);
         const resultats: FollowedArtiste[] = [];
         for (const id of artisteIds) {
-            const utilisateur = await this.utilisateurRepository.findById(id);
-            if (utilisateur) resultats.push({ id, pseudo: utilisateur.pseudo, photoProfilUrl: utilisateur.photoProfilUrl ?? undefined });
+            const [utilisateur, artiste] = await Promise.all([
+                this.utilisateurRepository.findById(id),
+                this.artisteRepository.findById(id),
+            ]);
+            if (utilisateur) {
+                // Priorité à la photo "artiste" — même logique que sur la fiche
+                // artiste (artistProfileService). Sans ce repli explicite vers
+                // artiste.photoArtisteUrl, la Bibliothèque affichait toujours une
+                // photo vide dès qu'un artiste ne s'était jamais servi du champ
+                // "photo de profil" générique (jamais éditable pour l'instant).
+                const photoUrl = artiste?.photoArtisteUrl ?? utilisateur.photoProfilUrl ?? undefined;
+                resultats.push({ id, pseudo: utilisateur.pseudo, photoProfilUrl: photoUrl });
+            }
         }
         return resultats;
     }
